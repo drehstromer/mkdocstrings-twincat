@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier
+_src_path: D:\\GIT\handler-template
+author_email: saruckan@gmail.com
+author_fullname: Samuel Ruckli
+author_username: samus
+copyright_date: '2023'
+copyright_holder: Samuel Ruckli
+copyright_holder_email: saruckan@gmail.com
+copyright_license: MIT License
+insiders: false
+language: Twincat
+project_description: A Twincat handler for mkdocstrings.
+project_name: mkdocstrings-twincat
+python_package_distribution_name: mkdocstrings-twincat
+python_package_import_name: twincat
+repository_name: mkdocstrings-twincat
+repository_namespace: samus
+repository_provider: github.com
+
