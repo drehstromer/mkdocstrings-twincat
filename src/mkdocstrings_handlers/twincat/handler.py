@@ -50,6 +50,12 @@ class TwincatHandler(BaseHandler):
     **`heading_level`** | `int` | The initial heading level to use. | `2`
     """
 
+
+    def __init__(self, handler: str, theme: str, custom_templates: str | None = None) -> None:
+        super().__init__(handler, theme, custom_templates)
+
+        self.summarys : blark.summary
+
     def collect(self, identifier: str, config: MutableMapping[str, Any]) -> CollectorItem:  # noqa: ARG002
         """Collect data given an identifier and selection configuration.
 
@@ -67,12 +73,11 @@ class TwincatHandler(BaseHandler):
             Anything you want, as long as you can feed it to the `render` method.
         """
         parsed = list(blark.parse(identifier))
-        
-        summary = blark.summary.CodeSummary.from_parse_results(parsed)
+        self.summary = blark.summary.CodeSummary.from_parse_results(parsed)
+        self.summary.find(identifier)
 
 
-
-        return(summary)
+        return(self.summary.find(identifier))
 
     def render(self, data: CollectorItem, config: Mapping[str, Any]) -> str:  # noqa: ARG002
         """Render a template using provided data and configuration options.
@@ -92,7 +97,26 @@ class TwincatHandler(BaseHandler):
         #     **{"config": final_config, data...: data, "heading_level": heading_level, "root": True},
         # )
         #raise PluginError("Implement me!")
-        return(data)
+
+        templatename = self.do_get_template(data)
+        template = self.env.get_template(templatename)
+        
+        final_config = {**self.default_config, **config}
+        heading_level = final_config["heading_level"]
+
+        return template.render(
+            **{"config": final_config, data: data, "heading_level": heading_level, "root": True})
+
+
+
+
+
+
+        
+
+    def do_get_template(self, summaryType:blark.summary.CodeSummaryType):
+        return f"{type(summaryType)}.html"
+
 
     def update_env(self, md: Markdown, config: dict) -> None:
         """Update the Jinja environment with any custom settings/filters/options for this handler.

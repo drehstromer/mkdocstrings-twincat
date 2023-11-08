@@ -1,0 +1,11 @@
+<div class="doc doc-object doc-functionblock">
+    <span class="doc doc-object-name doc-functionblock-name">{{data.name}}{% if data.extends %} extends {{data.extends}} {% endif %} </span>
+
+    <div class="doc doc-contents">
+        <details class="quote">
+            <summary>Source code in <code>{{ data.filepath }}</code></summary>
+            {{ data.source|highlight(language="st", linestart=0, linenums=True) }}
+        </details>
+    </div>
+
+</div>
