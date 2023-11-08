@@ -5,8 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, Mapping, MutableMapping
 
 from mkdocs.exceptions import PluginError
-from mkdocstrings.handlers.base import BaseHandler, CollectionError, CollectorItem
+from mkdocstrings.handlers.base import BaseHandler, CollectorItem
 from mkdocstrings.loggers import get_logger
+
+import blark.parse
+import blark.summary
+import blark.util
+import blark.input
+
 
 if TYPE_CHECKING:
     from markdown import Markdown
@@ -60,8 +66,13 @@ class TwincatHandler(BaseHandler):
         Returns:
             Anything you want, as long as you can feed it to the `render` method.
         """
-        #raise CollectionError("Implement me!")
-        return(identifier)
+        parsed = list(blark.parse(identifier))
+        
+        summary = blark.summary.CodeSummary.from_parse_results(parsed)
+
+
+
+        return(summary)
 
     def render(self, data: CollectorItem, config: Mapping[str, Any]) -> str:  # noqa: ARG002
         """Render a template using provided data and configuration options.
