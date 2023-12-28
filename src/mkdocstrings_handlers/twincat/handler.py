@@ -8,6 +8,7 @@ from contextlib import chdir
 import glob
 import os
 import sys
+import pathlib
 
 from mkdocs.exceptions import PluginError
 from mkdocstrings.handlers.base import BaseHandler, CollectorItem
@@ -59,27 +60,32 @@ class TwincatHandler(BaseHandler):
     def __init__(self,  
                 *args: Any, 
                 config_file_path: str | None = None,
-                paths: list[str] | None = None,
+                path: str ="",
                 **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self._config_file_path = config_file_path
-        paths = paths or []
-        glob_base_dir = os.path.dirname(os.path.abspath(config_file_path)) if config_file_path else "."
-        with chdir(glob_base_dir):
-            resolved_globs = [glob.glob(path) for path in paths]
-        paths = [path for glob_list in resolved_globs for path in glob_list]
-        if not paths and config_file_path:
-            paths.append(os.path.dirname(config_file_path))
-        search_paths = [path for path in sys.path if path]  # eliminate empty path
-        for path in reversed(paths):
-            if not os.path.isabs(path) and config_file_path:
-                path = os.path.abspath(os.path.join(os.path.dirname(config_file_path), path))  # noqa: PLW2901
-            if path not in search_paths:
-                search_paths.insert(0, path)
-        self._paths = search_paths
+        self.path = None
+        acceptedFileEndings = [".tsproj",".plcproj",".sln"]
+        for FileEnding in acceptedFileEndings:
+            if path.endswith(FileEnding):
+                if not os.path.isabs(path) and config_file_path:
+                    path = os.path.abspath(os.path.join(os.path.dirname(config_file_path), path))  # noqa: PLW2901
+                self.path = path
+                logger.info(f"load: {self.path}")
 
+        if self.path is not None:
+            parsed = list(blark.parse.parse(self.path))
+            self._CodeSummary = blark.summary.CodeSummary.from_parse_results(parsed)
+            logger.info(f"CodeSummary loaded")
+        else:
+            self._CodeSummary = None
+            logger.warning("no Codesummary loaded")
+            
         
+
+
+   
 
     def collect(self, identifier: str, config: MutableMapping[str, Any]) -> CollectorItem:  # noqa: ARG002
         """Collect data given an identifier and selection configuration.
@@ -97,12 +103,10 @@ class TwincatHandler(BaseHandler):
         Returns:
             Anything you want, as long as you can feed it to the `render` method.
         """
-        parsed = list(blark.parse.parse(identifier))
-        
-        summary = blark.summary.CodeSummary.from_parse_results(parsed)
+        self.test =self._CodeSummary.find(identifier)
+     
+        return(self._CodeSummary.find(identifier))
 
-
-        return(summary.find("TcLog"))
 
     def render(self, data: CollectorItem, config: Mapping[str, Any]) -> str:  # noqa: ARG002
         """Render a template using provided data and configuration options.
@@ -158,9 +162,11 @@ class TwincatHandler(BaseHandler):
 
 
 def get_handler(
+    *,
     theme: str,
     custom_templates: str | None = None,
     config_file_path: str | None = None,  # noqa: ARG001
+    path: str = "",
     **config: Any,  # noqa: ARG001
 ) -> TwincatHandler:
     """Simply return an instance of `TwincatHandler`.
@@ -178,7 +184,6 @@ def get_handler(
         handler="twincat",
         theme=theme,
         custom_templates=custom_templates,
-        # To pass the following argument,
-        # you'll need to override the handler's __init__ method.
-        # config_file_path=config_file_path,
+        config_file_path=config_file_path,
+        path=path,
     )

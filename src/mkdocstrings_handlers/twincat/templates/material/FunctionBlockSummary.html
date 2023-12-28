@@ -7,7 +7,7 @@
             <code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
         </details>
 
-        <p><strong>Inputs</strong></p>
+        <p><strong>Variables</strong></p>
         <table>
           <thead>
             <tr>
@@ -18,21 +18,26 @@
             </tr>
           </thead>
           <tbody>
-            {% for parameter in data["Data"] %}
-              <tr>
-                <td><code>{{ parameter.name }}</code></td>
-                <td>
-                    {{ parameter.type }}
-                </td>
-                <td>
-                  <div class="doc-md-description">
-                    {{ parameter.comments[0] }}
-                  </div>
-                </td>
-                <td>
-                    {{ parameter.value }}
-                </td>
-              </tr>
+                <tr>
+                  <td colspan="4"> Inputs</td>
+                </tr>
+            {% for parameter in data.declarations.values() %}
+              {% if parameter.block == "VAR_INPUT" %}
+                <tr>
+                  <td><code>{{ parameter.name }}</code></td>
+                  <td>
+                      {{ parameter.type }}
+                  </td>
+                  <td>
+                    <div class="doc-md-description">
+                      {{ parameter.comments[0] }}
+                    </div>
+                  </td>
+                  <td>
+                      {% if parameter.value != "None" %}{{ parameter.value}}{% endif %}
+                  </td>
+                </tr>
+              {% endif %}
             {% endfor %}
           </tbody>
         </table>
