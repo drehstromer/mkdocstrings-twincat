@@ -3,9 +3,42 @@
 
     <div class="doc doc-contents">
         <details class="quote">
-            <summary>Source code in <code>{{ data.filepath }}</code></summary>
-            {{ data.source|highlight(language="st", linestart=0, linenums=True) }}
+            <summary>Source code in <code>{{ data.filename }}</code></summary>
+            <code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
         </details>
+
+        <p><strong>Inputs</strong></p>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for parameter in data["Data"] %}
+              <tr>
+                <td><code>{{ parameter.name }}</code></td>
+                <td>
+                    {{ parameter.type }}
+                </td>
+                <td>
+                  <div class="doc-md-description">
+                    {{ parameter.comments[0] }}
+                  </div>
+                </td>
+                <td>
+                    {{ parameter.value }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+
+
     </div>
 
 </div>

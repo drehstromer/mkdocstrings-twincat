@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar, Mapping, MutableMapping
 
+from contextlib import chdir
+import glob
+import os
+import sys
+
 from mkdocs.exceptions import PluginError
 from mkdocstrings.handlers.base import BaseHandler, CollectorItem
 from mkdocstrings.loggers import get_logger
@@ -26,6 +31,7 @@ class TwincatHandler(BaseHandler):
 
     domain: str = "twincat"
     """The cross-documentation domain/language for this handler."""
+
 
     enable_inventory: bool = False
     """Whether this handler is interested in enabling the creation of the `objects.inv` Sphinx inventory file."""
@@ -50,11 +56,30 @@ class TwincatHandler(BaseHandler):
     **`heading_level`** | `int` | The initial heading level to use. | `2`
     """
 
+    def __init__(self,  
+                *args: Any, 
+                config_file_path: str | None = None,
+                paths: list[str] | None = None,
+                **kwargs: Any,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self._config_file_path = config_file_path
+        paths = paths or []
+        glob_base_dir = os.path.dirname(os.path.abspath(config_file_path)) if config_file_path else "."
+        with chdir(glob_base_dir):
+            resolved_globs = [glob.glob(path) for path in paths]
+        paths = [path for glob_list in resolved_globs for path in glob_list]
+        if not paths and config_file_path:
+            paths.append(os.path.dirname(config_file_path))
+        search_paths = [path for path in sys.path if path]  # eliminate empty path
+        for path in reversed(paths):
+            if not os.path.isabs(path) and config_file_path:
+                path = os.path.abspath(os.path.join(os.path.dirname(config_file_path), path))  # noqa: PLW2901
+            if path not in search_paths:
+                search_paths.insert(0, path)
+        self._paths = search_paths
 
-    def __init__(self, handler: str, theme: str, custom_templates: str | None = None) -> None:
-        super().__init__(handler, theme, custom_templates)
-
-        self.summarys : blark.summary
+        
 
     def collect(self, identifier: str, config: MutableMapping[str, Any]) -> CollectorItem:  # noqa: ARG002
         """Collect data given an identifier and selection configuration.
@@ -72,12 +97,12 @@ class TwincatHandler(BaseHandler):
         Returns:
             Anything you want, as long as you can feed it to the `render` method.
         """
-        parsed = list(blark.parse(identifier))
-        self.summary = blark.summary.CodeSummary.from_parse_results(parsed)
-        self.summary.find(identifier)
+        parsed = list(blark.parse.parse(identifier))
+        
+        summary = blark.summary.CodeSummary.from_parse_results(parsed)
 
 
-        return(self.summary.find(identifier))
+        return(summary.find("TcLog"))
 
     def render(self, data: CollectorItem, config: Mapping[str, Any]) -> str:  # noqa: ARG002
         """Render a template using provided data and configuration options.
@@ -100,12 +125,12 @@ class TwincatHandler(BaseHandler):
 
         templatename = self.do_get_template(data)
         template = self.env.get_template(templatename)
-        
+
         final_config = {**self.default_config, **config}
         heading_level = final_config["heading_level"]
 
         return template.render(
-            **{"config": final_config, data: data, "heading_level": heading_level, "root": True})
+            **{"config": final_config, "data": data, "heading_level": heading_level, "root": True})
 
 
 
@@ -114,8 +139,8 @@ class TwincatHandler(BaseHandler):
 
         
 
-    def do_get_template(self, summaryType:blark.summary.CodeSummaryType):
-        return f"{type(summaryType)}.html"
+    def do_get_template(self, summaryType):
+        return f"{type(summaryType).__name__}.html"
 
 
     def update_env(self, md: Markdown, config: dict) -> None:
