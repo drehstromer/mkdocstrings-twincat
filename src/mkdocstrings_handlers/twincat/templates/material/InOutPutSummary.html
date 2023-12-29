@@ -1,63 +1,41 @@
-
-
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Default</th>
-          <th>Description</th>
-          <th>Parent</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% set inputs = data.declarations_by_block["VAR_INPUT"].values() %}
-        {% if not inputs = [] %}
-        <tr>
-          <td colspan="5">VAR_INPUT</td>
-        </tr>
-        {% for parameter in inputs %}
-        <tr>
-          <td><code>{{ parameter.name }}</code></td>
-          <td>
-            {{ parameter.type }}
-          </td>
-          <td>
-            {% if parameter.value != "None" %}{{ parameter.value}}{% endif %}
-          </td>
-          <td>
-            <div class="doc-md-description">
-              {{ parameter.comments[0] }}
-            </div>
-          </td>
-          <td>
-            {% if parameter.parent != "None" %}{{ parameter.parent}}{% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-        {% endif %}
-        <tr>
-          <td colspan="5">VAR_OUTPUT</td>
-        </tr>
-        {% for parameter in data.declarations_by_block["VAR_OUTPUT"].values() %}
-        <tr>
-          <td><code>{{ parameter.name }}</code></td>
-          <td>
-            {{ parameter.type }}
-          </td>
-          <td>
-            {% if parameter.value != "None" %}{{ parameter.value}}{% endif %}
-          </td>
-          <td>
-            <div class="doc-md-description">
-              {{ parameter.comments[0] }}
-            </div>
-          </td>
-          <td>
-            {% if parameter.parent != "None" %}{{ parameter.parent}}{% endif %}
-          </td>
-        </tr>
-
-        {% endfor %}
-      </tbody>
-    </table>
+{% set variables = data.declarations_by_block %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+      <th>Parent</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set varType = ["VAR_INPUT","VAR_OUTPUT"] %}
+    {% for Type in varType %}
+    {% if Type in variables %}
+    <tr>
+      <td colspan="5">{{Type}}</td>
+    </tr>
+    {% for parameter in variables[Type].values() %}
+    <tr>
+      <td><code>{{ parameter.name }}</code></td>
+      <td>
+        {{ parameter.type }}
+      </td>
+      <td>
+        {% if parameter.value != "None" %}{{ parameter.value}}{% endif %}
+      </td>
+      <td>
+        <div class="doc-md-description">
+          {{ parameter.comments[0] }}
+        </div>
+      </td>
+      <td>
+        {% if parameter.parent != "None" %}{{ parameter.parent}}{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>

@@ -11,65 +11,7 @@
 
 
     <p><strong>Variables</strong></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Default</th>
-          <th>Description</th>
-          <th>Parent</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colspan="5">VAR_INPUT</td>
-        </tr>
-        {% for parameter in data.declarations_by_block["VAR_INPUT"].values() %}
-        <tr>
-          <td><code>{{ parameter.name }}</code></td>
-          <td>
-            {{ parameter.type }}
-          </td>
-          <td>
-            {% if parameter.value != "None" %}{{ parameter.value}}{% endif %}
-          </td>
-          <td>
-            <div class="doc-md-description">
-              {{ parameter.comments[0] }}
-            </div>
-          </td>
-          <td>
-            {% if parameter.parent != "None" %}{{ parameter.parent}}{% endif %}
-          </td>
-        </tr>
-
-        {% endfor %}
-        <tr>
-          <td colspan="5">VAR_OUTPUT</td>
-        </tr>
-        {% for parameter in data.declarations_by_block["VAR_OUTPUT"].values() %}
-        <tr>
-          <td><code>{{ parameter.name }}</code></td>
-          <td>
-            {{ parameter.type }}
-          </td>
-          <td>
-            {% if parameter.value != "None" %}{{ parameter.value}}{% endif %}
-          </td>
-          <td>
-            <div class="doc-md-description">
-              {{ parameter.comments[0] }}
-            </div>
-          </td>
-          <td>
-            {% if parameter.parent != "None" %}{{ parameter.parent}}{% endif %}
-          </td>
-        </tr>
-
-        {% endfor %}
-      </tbody>
-    </table>
+    {% include 'InOutPutSummary.html' %}
   </div>
 
 </div>
