@@ -30,7 +30,7 @@
         </td>
         <td>
           <div class="doc-md-description">
-            {{ parameter.comments[0] }}
+            {% for comment in parameter.comments %} {{ comment|convert_markdown(heading_level, html_id) }} {% endfor %}
           </div>
         </td>
         <td>
@@ -55,7 +55,7 @@
     <li class="field-body">
       <b><code>{{ parameter.name }}: {{parameter.type}}{% if parameter.value != "None" %} := {{ parameter.value}}{% endif %}</code></b>
       <div class="doc-md-description">
-        {% if parameter.comments[0] != "" %} - {{ parameter.comments[0] }} {% endif %}
+        {% for comment in parameter.comments %} {{ comment|convert_markdown(heading_level, html_id) }} {% endfor %}
         {% if parameter.parent != "None" and parameter.parent != data.name%} (Instantiated in :{{ parameter.parent}}){%
         endif %}
       </div>
