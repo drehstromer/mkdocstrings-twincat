@@ -47,6 +47,7 @@ class TwincatHandler(BaseHandler):
         "show_root_heading": False,
         "show_root_toc_entry": True,
         "heading_level": 2,
+        "inoutput_rendering_style": "list",
     }
     """The default configuration options.
 
