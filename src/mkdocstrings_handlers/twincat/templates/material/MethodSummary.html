@@ -1,0 +1,20 @@
+<div class="doc doc-object doc-method">
+  <span class="doc doc-object-name doc-method-name">{{data.name}}</span>
+
+  <div class="doc doc-contents">
+    <details class="quote">
+      <summary>Source code in <code>{{ data.filename }}</code></summary>
+      <code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
+    </details>
+
+
+
+    <p><strong>Variables</strong></p>
+    {% include 'InOutputSummary.html' %}
+    <p><strong>Methods</strong></p>
+    {% for method in data.methods %}
+
+
+  </div>
+
+</div>

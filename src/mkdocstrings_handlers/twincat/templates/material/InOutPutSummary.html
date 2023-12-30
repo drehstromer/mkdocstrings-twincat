@@ -56,7 +56,7 @@
       <b><code>{{ parameter.name }}: {{parameter.type}}{% if parameter.value != "None" %} := {{ parameter.value}}{% endif %}</code></b>
       <div class="doc-md-description">
         {% for comment in parameter.comments %} {{ comment|convert_markdown(heading_level, html_id) }} {% endfor %}
-        {% if parameter.parent != "None" and parameter.parent != data.name%} (Instantiated in :{{ parameter.parent}}){%
+        {% if parameter.parent != "None" and parameter.parent != data.name%} (Instantiated in : {{ parameter.parent}}){%
         endif %}
       </div>
     </li>

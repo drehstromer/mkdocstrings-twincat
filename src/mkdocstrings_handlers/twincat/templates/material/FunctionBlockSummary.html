@@ -8,10 +8,17 @@
       <code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
     </details>
 
-
-
     <p><strong>Variables</strong></p>
     {% include 'InOutputSummary.html' %}
+    <p><strong>Methods</strong></p>
+    <ul>
+    {% for method in data.methods %}
+    <li>
+    <code>{{method.name}}</code> {% for comment in method.comments %} {{ comment }} {% endfor %} {% for pragma in method.pragmas %} {{ pragma }} {% endfor %}
+    </li>
+    {% endfor %}
+    </ul>
+
   </div>
 
 </div>
