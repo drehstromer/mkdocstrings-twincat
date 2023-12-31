@@ -159,6 +159,7 @@ class TwincatHandler(BaseHandler):
         """
         super().update_env(md, config)  # Add some mkdocstrings default filters such as highlight and convert_markdown
         self.env.filters["do_sort_extended_methods"] = rendering.do_sort_extended_methods
+        self.env.filters["do_sort_extended_properties"] = rendering.do_sort_extended_properties
         self.env.trim_blocks = True
         self.env.lstrip_blocks = True
         self.env.keep_trailing_newline = False
