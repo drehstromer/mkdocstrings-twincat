@@ -19,6 +19,7 @@ import blark.summary
 import blark.util
 import blark.input
 
+from mkdocstrings_handlers.twincat import rendering
 
 if TYPE_CHECKING:
     from markdown import Markdown
@@ -157,6 +158,7 @@ class TwincatHandler(BaseHandler):
                 of [mkdocstrings.plugin.MkdocstringsPlugin.on_config][] to see what's in this dictionary.
         """
         super().update_env(md, config)  # Add some mkdocstrings default filters such as highlight and convert_markdown
+        self.env.filters["do_sort_extended_methods"] = rendering.do_sort_extended_methods
         self.env.trim_blocks = True
         self.env.lstrip_blocks = True
         self.env.keep_trailing_newline = False
