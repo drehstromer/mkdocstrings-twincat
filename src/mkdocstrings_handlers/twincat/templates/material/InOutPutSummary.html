@@ -44,14 +44,16 @@
   </table>
   {% endblock table_style %}
 
+
 {% elif config.inoutput_rendering_style == "list" %}
   {% block list_style %}
-  {% set varType = ["VAR_INPUT","VAR_OUTPUT"] %}
-  {% for Type in varType %}
-  {% if Type in variables %}
-  {{Type}}
+  {% if "VAR_INPUT" in variables or "VAR_OUTPUT" in variables %}
+  <p><strong>Variables</strong></p>
+  {% endif %}
+  {% if "VAR_INPUT" in variables %}
+  Inputs:
   <ul>
-    {% for parameter in variables[Type].values() %}
+    {% for parameter in variables["VAR_INPUT"].values() %}
     <li class="field-body">
       <b><code>{{ parameter.name }}: {{parameter.type}}{% if parameter.value != "None" %} := {{ parameter.value}}{% endif %}</code></b>
       <div class="doc-md-description">
@@ -63,7 +65,21 @@
     {% endfor %}
   </ul>
   {% endif %}
-  {% endfor %}
+  {% if "VAR_OUTPUT" in variables %}
+  Outputs:
+  <ul>
+    {% for parameter in variables["VAR_OUTPUT"].values() %}
+    <li class="field-body">
+      <b><code>{{ parameter.name }}: {{parameter.type}}{% if parameter.value != "None" %} := {{ parameter.value}}{% endif %}</code></b>
+      <div class="doc-md-description">
+        {% for comment in parameter.comments %} {{ comment|convert_markdown(heading_level, html_id) }} {% endfor %}
+        {% if parameter.parent != "None" and parameter.parent != data.name%} (Instantiated in : {{ parameter.parent}}){%
+        endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   {% endblock list_style %}
 
 {% endif %}

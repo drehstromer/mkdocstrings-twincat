@@ -87,7 +87,7 @@ class TwincatHandler(BaseHandler):
         
 
 
-   
+
 
     def collect(self, identifier: str, config: MutableMapping[str, Any]) -> CollectorItem:  # noqa: ARG002
         """Collect data given an identifier and selection configuration.

@@ -1,18 +1,21 @@
 <div class="doc doc-object doc-method">
+    {% filter heading(heading_level,
+      role="method",
+      id="project."+data.parent+"."+data.name+"()",
+      class="doc doc-heading",
+      toc_label=data.name) %}
   <span class="doc doc-object-name doc-method-name">{{data.name}}</span>
-
+  {% endfilter %}
   <div class="doc doc-contents">
     <details class="quote">
-      <summary>Source code in <code>{{ data.filename }}</code></summary>
-      <code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
+      <summary>Source code in <code>{{ data.filename }}</code></summary><code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
     </details>
 
 
 
-    <p><strong>Variables</strong></p>
+   
     {% include 'InOutputSummary.html' %}
-    <p><strong>Methods</strong></p>
-    {% for method in data.methods %}
+ 
 
 
   </div>

@@ -1,18 +1,28 @@
 <div class="doc doc-object doc-functionblock">
-  <span class="doc doc-object-name doc-functionblock-name">{{data.name}}{% if data.extends %} <code>EXTENDS</code> {{data.extends}}{% endif %}
+  {% with html_id = "project."+data.name %}  
+
+  {% filter heading(heading_level,
+    role="functionblock",
+    id=html_id,
+    class="doc doc-heading",
+    toc_label=data.name) %}
+  <span class="doc doc-object-name doc-functionblock-name">{{data.name}}</span>
+    {% endfilter %}
+    {% if data.extends %} <code>EXTENDS</code> {{data.extends}}{% endif %}
     {% if data.implements %} <code>IMPLEMENTS</code> {{', '.join(data.implements)}}
-    {% endif %} </span>
+    {% endif %} 
 
   <div class="doc doc-contents">
     <details class="quote">
-      <summary>Source code in <code>{{ data.filename }}</code></summary>
-      <code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
+      <summary>Source code in <code>{{ data.filename }}</code></summary><code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
     </details>
     
-    {% if data.methods %}
-    <p><strong>Variables</strong></p>
+    {% for comment in data.comments %} {{comment}} {% endfor %}
+    
+    {% set heading_level = heading_level + 1 %}
     {% include 'InOutputSummary.html' %}
 
+    {% if data.methods %}
     <p><strong>Methods</strong></p>
     <ul>
     {% for method in data.methods|do_sort_extended_methods() %}
@@ -43,5 +53,5 @@
     {% endif %}
 
   </div>
-
+{% endwith %}
 </div>
