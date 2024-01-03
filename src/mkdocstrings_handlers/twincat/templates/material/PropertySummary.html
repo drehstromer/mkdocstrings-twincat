@@ -1,0 +1,23 @@
+<div class="doc doc-object doc-property">
+    {% filter heading(heading_level,
+      role="property",
+      id="project."+data.parent+"."+data.name,
+      class="doc doc-heading",
+      toc_label=data.name) %}
+  <span class="doc doc-object-name doc-method-name">{{data.name}}</span>
+  {% endfilter %}
+  <div class="doc doc-contents">
+    <details class="quote">
+      <summary>Source code in <code>{{ data.filename }}</code></summary><code>{{ data.source_code|highlight(language="ST", inline=False) }}</code>
+    </details>
+
+
+
+   
+    
+ 
+
+
+  </div>
+
+</div>
