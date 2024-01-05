@@ -38,7 +38,7 @@ Documentation = "https://samus.github.io/mkdocstrings-twincat"
 Changelog = "https://samus.github.io/mkdocstrings-twincat/changelog"
 Repository = "https://github.com/samus/mkdocstrings-twincat"
 
-Discujjssions = "https://github.com/samus/mkdocstrings-twincat/discussions"
+Discussions = "https://github.com/samus/mkdocstrings-twincat/discussions"
 Gitter = "https://gitter.im/mkdocstrings-twincat/community"
 Funding = "https://github.com/sponsors/samus"
 
