@@ -1,22 +1,20 @@
-# mkdocstrings-twincat in development!
+# mkdocstrings-twincat
 
-[![ci](https://github.com/samus/mkdocstrings-twincat/workflows/ci/badge.svg)](https://github.com/samus/mkdocstrings-twincat/actions?query=workflow%3Aci)
-[![documentation](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://samus.github.io/mkdocstrings-twincat/)
+[![ci](https://github.com/drehstromer/mkdocstrings-twincat/workflows/ci/badge.svg)](https://github.com/drehstromer/mkdocstrings-twincat/actions?query=workflow%3Aci)
+[![documentation](https://img.shields.io/badge/docs-mkdocs-708FCC.svg?style=flat)](https://drehstromer.github.io/mkdocstrings-twincat/)
 [![pypi version](https://img.shields.io/pypi/v/mkdocstrings-twincat.svg)](https://pypi.org/project/mkdocstrings-twincat/)
-[![gitpod](https://img.shields.io/badge/gitpod-workspace-blue.svg?style=flat)](https://gitpod.io/#https://github.com/samus/mkdocstrings-twincat)
-[![gitter](https://badges.gitter.im/join%20chat.svg)](https://gitter.im/mkdocstrings-twincat/community)
+[![gitter](https://badges.gitter.im/join%20chat.svg)](https://app.gitter.im/#/room/#mkdocstrings-twincat:gitter.im)
 
-A Twincat handler for mkdocstrings.
+A Twincathandler for mkdocstrings
 
 ## Installation
 
-With `pip`:
 ```bash
 pip install mkdocstrings-twincat
 ```
 
-With [`pipx`](https://github.com/pipxproject/pipx):
+With [`uv`](https://docs.astral.sh/uv/):
+
 ```bash
-python3.8 -m pip install --user pipx
-pipx install mkdocstrings-twincat
+uv tool install mkdocstrings-twincat
 ```
