@@ -50,7 +50,7 @@ PASTE TRACEBACK HERE
      redacting sensitive information. -->
 
 ```bash
-mkdocstrings-twincat --debug-info  # | xclip -selection clipboard
+python -m mkdocstrings_handlers.twincat._internal.debug  # | xclip -selection clipboard
 ```
 
 PASTE MARKDOWN OUTPUT HERE

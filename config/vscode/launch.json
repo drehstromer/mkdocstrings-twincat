@@ -14,7 +14,7 @@
             "name": "run",
             "type": "debugpy",
             "request": "launch",
-            "module": "mkdocstrings_twincat",
+            "module": "twincat",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": "${command:pickArgs}"

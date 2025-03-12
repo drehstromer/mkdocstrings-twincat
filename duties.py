@@ -92,6 +92,7 @@ def check_docs(ctx: Context) -> None:
 @duty
 def check_types(ctx: Context) -> None:
     """Check that the code is correctly typed."""
+    os.environ["MYPYPATH"] = "src"
     os.environ["FORCE_COLOR"] = "1"
     ctx.run(
         tools.mypy(*PY_SRC_LIST, config_file="config/mypy.ini"),
@@ -103,7 +104,7 @@ def check_types(ctx: Context) -> None:
 def check_api(ctx: Context, *cli_args: str) -> None:
     """Check for API breaking changes."""
     ctx.run(
-        tools.griffe.check("mkdocstrings_twincat", search=["src"], color=True).add_args(*cli_args),
+        tools.griffe.check("mkdocstrings_handlers.twincat", search=["src"], color=True).add_args(*cli_args),
         title="Checking for API breaking changes",
         nofail=True,
     )

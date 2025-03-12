@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier.
-_commit: 1.8.0
-_src_path: gh:pawamoy/copier-uv
+_commit: 1.4.0
+_src_path: gh:mkdocstrings/handler-template
 author_email: privat@samuelruckli.ch
 author_fullname: Samuel Ruckli
 author_username: drehstromer
@@ -9,11 +9,11 @@ copyright_holder: Samuel Ruckli
 copyright_holder_email: privat@samuelruckli.ch
 copyright_license: MIT
 insiders: false
-project_description: A Twincathandler for mkdocstrings
+language: twincat
+project_description: A Twincat handler for mkdocstrings.
 project_name: mkdocstrings-twincat
-python_package_command_line_name: mkdocstrings-twincat
 python_package_distribution_name: mkdocstrings-twincat
-python_package_import_name: mkdocstrings_twincat
+python_package_import_name: twincat
 repository_name: mkdocstrings-twincat
 repository_namespace: drehstromer
 repository_provider: github.com

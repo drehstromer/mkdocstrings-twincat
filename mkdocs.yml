@@ -1,10 +1,10 @@
 site_name: "mkdocstrings-twincat"
-site_description: "A Twincathandler for mkdocstrings"
+site_description: "A Twincat handler for mkdocstrings."
 site_url: "https://drehstromer.github.io/mkdocstrings-twincat"
 repo_url: "https://github.com/drehstromer/mkdocstrings-twincat"
 repo_name: "drehstromer/mkdocstrings-twincat"
 site_dir: "site"
-watch: [mkdocs.yml, README.md, CONTRIBUTING.md, CHANGELOG.md, src/mkdocstrings_twincat]
+watch: [mkdocs.yml, README.md, CONTRIBUTING.md, CHANGELOG.md, src/mkdocstrings_handlers]
 copyright: Copyright &copy; 2025 Samuel Ruckli
 edit_uri: edit/main/docs/
 
@@ -19,11 +19,19 @@ nav:
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md
+- Usage:
+  - usage/index.md
+  - Configuration:
+    - usage/configuration/index.md
+    - General: usage/configuration/general.md
+    - Headings: usage/configuration/headings.md
+  - Customization: usage/customization.md
 - API reference: reference/api.md
 - Development:
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md
   - Coverage report: coverage.md
+  - mkdocstrings: https://mkdocstrings.github.io/
 
 theme:
   name: material
@@ -106,12 +114,14 @@ plugins:
       python:
         inventories:
         - https://docs.python.org/3/objects.inv
+        - https://mkdocstrings.github.io/objects.inv
         paths: [src]
         options:
           backlinks: tree
           docstring_options:
             ignore_init_summary: true
           docstring_section_style: list
+          extensions: [scripts/griffe_extensions.py]
           filters: ["!^_"]
           heading_level: 1
           inherited_members: true

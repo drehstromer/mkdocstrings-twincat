@@ -4,7 +4,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "mkdocstrings-twincat"
-description = "A Twincathandler for mkdocstrings"
+description = "A Twincat handler for mkdocstrings."
 authors = [{name = "Samuel Ruckli", email = "privat@samuelruckli.ch"}]
 license = "MIT"
 license-files = ["LICENSE"]
@@ -29,7 +29,9 @@ classifiers = [
     "Topic :: Utilities",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "mkdocstrings>=0.18",
+]
 
 [project.urls]
 Homepage = "https://drehstromer.github.io/mkdocstrings-twincat"
@@ -41,14 +43,15 @@ Discussions = "https://github.com/drehstromer/mkdocstrings-twincat/discussions"
 Gitter = "https://gitter.im/mkdocstrings-twincat/community"
 Funding = "https://github.com/sponsors/drehstromer"
 
-[project.scripts]
-mkdocstrings-twincat = "mkdocstrings_twincat.cli:main"
-
 [tool.pdm.version]
 source = "call"
 getter = "scripts.get_version:get_version"
 
 [tool.pdm.build]
+package-dir = "src"
+includes = ["src/mkdocstrings_handlers"]
+editable-backend = "editables"
+
 # Include as much as possible in the source distribution, to help redistributors.
 excludes = ["**/.pytest_cache"]
 source-includes = [

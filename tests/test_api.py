@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING
 
 import griffe
 import pytest
-from mkdocstrings.inventory import Inventory
+from mkdocstrings import Inventory
 
-import mkdocstrings_twincat
+from mkdocstrings_handlers import twincat
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -19,19 +19,19 @@ if TYPE_CHECKING:
 @pytest.fixture(name="loader", scope="module")
 def _fixture_loader() -> griffe.GriffeLoader:
     loader = griffe.GriffeLoader()
-    loader.load("mkdocstrings_twincat")
+    loader.load("mkdocstrings_handlers.twincat")
     loader.resolve_aliases()
     return loader
 
 
 @pytest.fixture(name="internal_api", scope="module")
 def _fixture_internal_api(loader: griffe.GriffeLoader) -> griffe.Module:
-    return loader.modules_collection["mkdocstrings_twincat._internal"]
+    return loader.modules_collection["mkdocstrings_handlers.twincat._internal"]
 
 
 @pytest.fixture(name="public_api", scope="module")
 def _fixture_public_api(loader: griffe.GriffeLoader) -> griffe.Module:
-    return loader.modules_collection["mkdocstrings_twincat"]
+    return loader.modules_collection["mkdocstrings_handlers.twincat"]
 
 
 def _yield_public_objects(
@@ -97,11 +97,11 @@ def _fixture_inventory() -> Inventory:
 
 
 def test_exposed_objects(modulelevel_internal_objects: list[griffe.Object | griffe.Alias]) -> None:
-    """All public objects in the internal API are exposed under `mkdocstrings_twincat`."""
+    """All public objects in the internal API are exposed under `mkdocstrings_handlers.twincat`."""
     not_exposed = [
         obj.path
         for obj in modulelevel_internal_objects
-        if obj.name not in mkdocstrings_twincat.__all__ or not hasattr(mkdocstrings_twincat, obj.name)
+        if obj.name not in twincat.__all__ or not hasattr(twincat, obj.name)
     ]
     assert not not_exposed, "Objects not exposed:\n" + "\n".join(sorted(not_exposed))
 
@@ -122,7 +122,7 @@ def test_single_locations(public_api: griffe.Module) -> None:
         return obj.is_public and (obj.parent is None or _public_path(obj.parent))
 
     multiple_locations = {}
-    for obj_name in mkdocstrings_twincat.__all__:
+    for obj_name in twincat.__all__:
         obj = public_api[obj_name]
         if obj.aliases and (
             public_aliases := [path for path, alias in obj.aliases.items() if path != obj.path and _public_path(alias)]
@@ -151,7 +151,8 @@ def test_inventory_matches_api(
     """The inventory doesn't contain any additional Python object."""
     not_in_api = []
     public_api_paths = {obj.path for obj in public_objects}
-    public_api_paths.add("mkdocstrings_twincat")
+    public_api_paths.add("mkdocstrings_handlers")
+    public_api_paths.add("mkdocstrings_handlers.twincat")
     for item in inventory.values():
         if item.domain == "py" and "(" not in item.name:
             obj = loader.modules_collection[item.name]

@@ -5,7 +5,7 @@
 [![pypi version](https://img.shields.io/pypi/v/mkdocstrings-twincat.svg)](https://pypi.org/project/mkdocstrings-twincat/)
 [![gitter](https://badges.gitter.im/join%20chat.svg)](https://app.gitter.im/#/room/#mkdocstrings-twincat:gitter.im)
 
-A Twincathandler for mkdocstrings
+A Twincat handler for mkdocstrings.
 
 ## Installation
 
@@ -13,8 +13,4 @@ A Twincathandler for mkdocstrings
 pip install mkdocstrings-twincat
 ```
 
-With [`uv`](https://docs.astral.sh/uv/):
 
-```bash
-uv tool install mkdocstrings-twincat
-```
