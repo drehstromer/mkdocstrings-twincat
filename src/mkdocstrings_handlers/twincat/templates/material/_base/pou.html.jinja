@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{{ obj.name }} - TwinCAT POU Documentation{% endblock %}
+
+{% block content %}
+<div class="doc-section">
+    <h1 class="doc-section-title">{{ obj.name }}</h1>
+    
+    <div class="doc-item">
+        <span class="badge badge-primary">POU</span>
+        {% if obj.extends %}
+        <span class="doc-item-name">Extends:</span>
+        <span class="doc-item-type">{{ obj.extends }}</span>
+        {% endif %}
+        
+        {% if obj.implements %}
+        <div class="doc-item">
+            <span class="doc-item-name">Implements:</span>
+            <ul>
+                {% for interface in obj.implements %}
+                <li>{{ interface }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% include "documentation.html" %}
+    
+    {% include "variable_section.html" %}
+    
+    {% if obj.implementation %}
+    <div class="doc-section">
+        <h3 class="doc-section-title">Implementation</h3>
+        <pre><code>{{ obj.implementation }}</code></pre>
+    </div>
+    {% endif %}
+    
+    {% include "method.html" %}
+    
+    {% include "property.html" %}
+</div>
+{% endblock %}

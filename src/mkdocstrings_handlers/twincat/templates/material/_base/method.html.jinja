@@ -1,0 +1,44 @@
+{% if obj.methods %}
+<div class="doc-section">
+    <h3 class="doc-section-title">Methods</h3>
+    
+    {% for method in obj.methods %}
+    <div class="doc-subsection">
+        <h4 class="doc-subsection-title" id="method-{{ method.name }}">
+            {{ method.name }}
+            {% if method.accessModifier %}
+            <span class="badge badge-info">{{ method.accessModifier }}</span>
+            {% endif %}
+        </h4>
+        
+        {% if method.returnType %}
+        <div class="doc-item">
+            <span class="doc-item-name">Return Type:</span>
+            <span class="doc-item-type">{{ method.returnType }}</span>
+        </div>
+        {% endif %}
+        
+        {% if method.documentation %}
+        <div class="doc-item">
+            {% set obj = method %}
+            {% include "documentation.html" %}
+        </div>
+        {% endif %}
+        
+        {% if method.variable_sections %}
+        <div class="doc-item">
+            {% set obj = method %}
+            {% include "variable_section.html" %}
+        </div>
+        {% endif %}
+        
+        {% if method.implementation %}
+        <div class="doc-item">
+            <h5>Implementation</h5>
+            <pre><code>{{ method.implementation }}</code></pre>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
