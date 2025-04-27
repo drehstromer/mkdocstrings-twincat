@@ -1,29 +1,40 @@
-# General options
+# General Options
 
-[](){ #option-extra }
-## `extra`
+This page explains the general options available for the TwinCAT handler.
 
-- **:octicons-package-24: Type [`dict`][] :material-equal: `{}`{ title="default value" }**
+## extra
 
-The `extra` option lets you inject additional variables into the Jinja context used when rendering templates. You can then use this extra context in your overridden templates.
+The `extra` option is a dictionary of additional options for the TwinCAT handler.
 
-Local `extra` options will be merged into the global `extra` option:
-
-```yaml title="in mkdocs.yml (global configuration)"
-plugins:
-- mkdocstrings:
-    handlers:
-      twincat:
-        options:
-          extra:
-            hello: world
+```yaml
+extra:
+  search_path: path/to/your/twincat/files
 ```
 
-```md title="in docs/some_page.md (local configuration)"
-::: your_package.your_module.your_func
-    options:
-      extra:
-        foo: bar
+### search_path
+
+The `search_path` option is required and should point to the directory containing your TwinCAT files. This can be an absolute path or a path relative to your mkdocs.yml file.
+
+```yaml
+search_path: path/to/your/twincat/files
 ```
 
-...will inject both `hello` and `foo` into the Jinja context when rendering `your_package.your_module.your_func`.
+## heading
+
+The `heading` option allows you to override the heading text for the object being documented.
+
+```yaml
+heading: "Custom Heading"
+```
+
+By default, the heading is the name of the object being documented.
+
+## heading_level
+
+The `heading_level` option sets the initial heading level for the object being documented.
+
+```yaml
+heading_level: 2
+```
+
+The default value is `2`, which means the object's name will be rendered as an `<h2>` heading. Child elements will use higher heading levels.
