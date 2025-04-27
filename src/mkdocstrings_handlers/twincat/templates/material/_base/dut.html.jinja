@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ obj.name }} - TwinCAT DUT Documentation{% endblock %}
+
+{% block content %}
+<div class="doc-section">
+    <h1 class="doc-section-title">{{ obj.name }}</h1>
+    
+    <div class="doc-item">
+        <span class="badge badge-success">DUT</span>
+    </div>
+    
+    {% include "documentation.html" %}
+    
+    {% include "variable_section.html" %}
+    
+    {% if obj.declaration %}
+    <div class="doc-section">
+        <h3 class="doc-section-title">Declaration</h3>
+        <pre><code>{{ obj.declaration }}</code></pre>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

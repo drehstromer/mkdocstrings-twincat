@@ -1,17 +1,17 @@
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "mkdocstrings-twincat"
-description = "A Twincat handler for mkdocstrings."
+description = "A Twincat handler for mkdocstrings that uses pytwincatparser."
 authors = [{name = "Samuel Ruckli", email = "privat@samuelruckli.ch"}]
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.9"
-keywords = []
-dynamic = ["version"]
+keywords = ["mkdocstrings", "twincat", "documentation", "mkdocs", "pytwincatparser"]
+version = "0.1.0"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -31,6 +31,7 @@ classifiers = [
 ]
 dependencies = [
     "mkdocstrings>=0.18",
+    "pytwincatparser>=0.1.0",
 ]
 
 [project.urls]
@@ -43,38 +44,26 @@ Discussions = "https://github.com/drehstromer/mkdocstrings-twincat/discussions"
 Gitter = "https://gitter.im/mkdocstrings-twincat/community"
 Funding = "https://github.com/sponsors/drehstromer"
 
-[tool.pdm.version]
-source = "call"
-getter = "scripts.get_version:get_version"
+[project.entry-points."mkdocstrings.handlers"]
+twincat = "mkdocstrings_handlers.twincat:get_handler"
 
-[tool.pdm.build]
-package-dir = "src"
-includes = ["src/mkdocstrings_handlers"]
-editable-backend = "editables"
 
-# Include as much as possible in the source distribution, to help redistributors.
-excludes = ["**/.pytest_cache"]
-source-includes = [
-    "config",
+[tool.hatch.build]
+packages = ["src/mkdocstrings_handlers"]
+exclude = ["**/.pytest_cache"]
+include = [
     "docs",
-    "scripts",
-    "share",
-    "tests",
-    "duties.py",
     "mkdocs.yml",
     "*.md",
     "LICENSE",
 ]
 
-[tool.pdm.build.wheel-data]
-# Manual pages can be included in the wheel.
-# Depending on the installation tool, they will be accessible to users.
-# pipx supports it, uv does not yet, see https://github.com/astral-sh/uv/issues/4731.
-data = [
-    {path = "share/**/*", relative-to = "."},
-]
+[tool.hatch.build.targets.wheel.shared-data]
+"share" = "share"
 
-[dependency-groups]
+[tool.uv]
+# Development dependencies
+[tool.uv.dev-dependencies]
 maintain = [
     "build>=1.2",
     "git-changelog>=2.5",
@@ -92,7 +81,7 @@ ci = [
     "types-markdown>=3.6",
     "types-pyyaml>=6.0",
 ]
- docs = [
+docs = [
     "markdown-callouts>=0.4",
     "markdown-exec>=1.8",
     "mkdocs>=1.6",
@@ -103,9 +92,6 @@ ci = [
     "mkdocs-minify-plugin>=0.8",
     "mkdocs-section-index>=0.3",
     "mkdocstrings[python]>=0.29",
-    # YORE: EOL 3.10: Remove line.
     "tomli>=2.0; python_version < '3.11'",
 ]
-
-[tool.uv]
 default-groups = ["maintain", "ci", "docs"]

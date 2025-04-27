@@ -1,0 +1,40 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}TwinCAT Documentation{% endblock %}
+
+{% block content %}
+<h1>TwinCAT Documentation</h1>
+
+{% if pous %}
+<div class="doc-section">
+    <h2 class="doc-section-title">Program Organization Units (POUs)</h2>
+    <ul>
+        {% for name, pou in pous %}
+        <li><a href="pou_{{ name | replace('.', '_') }}.html">{{ pou.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if duts %}
+<div class="doc-section">
+    <h2 class="doc-section-title">Data Unit Types (DUTs)</h2>
+    <ul>
+        {% for name, dut in duts %}
+        <li><a href="dut_{{ name | replace('.', '_') }}.html">{{ dut.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if itfs %}
+<div class="doc-section">
+    <h2 class="doc-section-title">Interfaces</h2>
+    <ul>
+        {% for name, itf in itfs %}
+        <li><a href="itf_{{ name | replace('.', '_') }}.html">{{ itf.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}{{ obj.name }} - TwinCAT POU Documentation{% endblock %}
+
+{% block content %}
+<div class="doc-section">
+    <h1 class="doc-section-title">{{ obj.name }}</h1>
+    
+    <div class="doc-item">
+        <span class="badge badge-primary">POU</span>
+        {% if obj.extends %}
+        <span class="doc-item-name">Extends:</span>
+        <span class="doc-item-type">{{ obj.extends }}</span>
+        {% endif %}
+        
+        {% if obj.implements %}
+        <div class="doc-item">
+            <span class="doc-item-name">Implements:</span>
+            <ul>
+                {% for interface in obj.implements %}
+                <li>{{ interface }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% include "tcdocumentation.html.jinja" %}
+    
+    {% if obj.declaration %}
+    <div class="doc-section">
+        <h3 class="doc-section-title">Declaration</h3>
+        <pre><code>{{ obj.declaration }}</code></pre>
+    </div>
+    {% endif %}
+    
+    {% include "tcvariable_section.html.jinja" %}
+    
+    {% if obj.implementation %}
+    <div class="doc-section">
+        <h3 class="doc-section-title">Implementation</h3>
+        <pre><code>{{ obj.implementation }}</code></pre>
+    </div>
+    {% endif %}
+    
+    {% if obj.methods %}
+    <div class="doc-section">
+        <h3 class="doc-section-title">Methods</h3>
+        
+        {% for method in obj.methods %}
+            {% include "tcmethod.html.jinja" %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if obj.properties %}
+    <div class="doc-section">
+        <h3 class="doc-section-title">Properties</h3>
+        
+        {% for property in obj.properties %}
+            {% include "tcproperty.html.jinja" %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% if obj.documentation %}
+<div class="doc-section">
+    <h3 class="doc-section-title">Documentation</h3>
+    
+    {% if obj.documentation.brief %}
+    <div class="doc-tag">
+        <span class="doc-tag-name">Brief:</span>
+        <span class="doc-tag-value">{{ obj.documentation.brief }}</span>
+    </div>
+    {% endif %}
+    
+    {% if obj.documentation.details %}
+    <div class="doc-tag">
+        <span class="doc-tag-name">Details:</span>
+        <span class="doc-tag-value">{{ obj.documentation.details }}</span>
+    </div>
+    {% endif %}
+    
+    {% if obj.documentation.usage %}
+    <div class="doc-tag">
+        <span class="doc-tag-name">Usage:</span>
+        <span class="doc-tag-value">{{ obj.documentation.usage }}</span>
+    </div>
+    {% endif %}
+    
+    {% if obj.documentation.returns %}
+    <div class="doc-tag">
+        <span class="doc-tag-name">Returns:</span>
+        <span class="doc-tag-value">{{ obj.documentation.returns }}</span>
+    </div>
+    {% endif %}
+    
+    {% if obj.documentation.custom_tags %}
+    {% for tag_name, tag_value in obj.documentation.custom_tags.items() %}
+    <div class="doc-tag">
+        <span class="doc-tag-name">{{ tag_name }}:</span>
+        <span class="doc-tag-value">{{ tag_value }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endif %}

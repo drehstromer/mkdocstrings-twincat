@@ -1,0 +1,46 @@
+{% if obj.variable_sections %}
+<div class="doc-section">
+    <h3 class="doc-section-title">Variables</h3>
+    
+    {% for section in obj.variable_sections %}
+    <div class="doc-subsection">
+        <h4 class="doc-subsection-title">{{ section.section_type }}</h4>
+        
+        {% if section.variables %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Initial Value</th>
+                    <th>Comment</th>
+                    <th>Attributes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for var in section.variables %}
+                <tr>
+                    <td class="doc-item-name">{{ var.name }}</td>
+                    <td class="doc-item-type">{{ var.type }}</td>
+                    <td>{% if var.initial_value %}{{ var.initial_value }}{% endif %}</td>
+                    <td>{% if var.comment %}{{ var.comment }}{% endif %}</td>
+                    <td>
+                        {% if var.attributes %}
+                        <ul style="margin: 0; padding-left: 1.5rem;">
+                            {% for attr_name, attr_value in var.attributes.items() %}
+                            <li><code>{{ attr_name }}</code>{% if attr_value %}: {{ attr_value }}{% endif %}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No variables defined in this section.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

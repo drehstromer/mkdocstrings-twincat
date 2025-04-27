@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TwinCAT Documentation{% endblock %}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #111;
+        }
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.75rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        h5 { font-size: 1.1rem; }
+        h6 { font-size: 1rem; }
+        
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        code {
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            background-color: #f6f8fa;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 85%;
+        }
+        
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            padding: 1rem;
+            overflow: auto;
+        }
+        
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        table, th, td {
+            border: 1px solid #dfe2e5;
+        }
+        
+        th, td {
+            padding: 0.5rem 1rem;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+        }
+        
+        .badge-primary { background-color: #0366d6; color: white; }
+        .badge-secondary { background-color: #6c757d; color: white; }
+        .badge-success { background-color: #28a745; color: white; }
+        .badge-info { background-color: #17a2b8; color: white; }
+        .badge-warning { background-color: #ffc107; color: #212529; }
+        .badge-danger { background-color: #dc3545; color: white; }
+        
+        .doc-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eaecef;
+        }
+        
+        .doc-section:last-child {
+            border-bottom: none;
+        }
+        
+        .doc-section-title {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eaecef;
+        }
+        
+        .doc-subsection {
+            margin-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .doc-subsection-title {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .doc-item {
+            margin-bottom: 1rem;
+        }
+        
+        .doc-item-name {
+            font-weight: 600;
+        }
+        
+        .doc-item-type {
+            color: #6a737d;
+        }
+        
+        .doc-item-description {
+            margin-top: 0.25rem;
+        }
+        
+        .doc-item-attributes {
+            margin-top: 0.25rem;
+            font-size: 0.9rem;
+            color: #6a737d;
+        }
+        
+        .doc-item-value {
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+        
+        .doc-tag {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .doc-tag-name {
+            font-weight: 600;
+        }
+        
+        .doc-tag-value {
+            margin-left: 0.5rem;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

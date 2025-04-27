@@ -1,0 +1,40 @@
+{% if obj.properties %}
+<div class="doc-section">
+    <h3 class="doc-section-title">Properties</h3>
+    
+    {% for property in obj.properties %}
+    <div class="doc-subsection">
+        <h4 class="doc-subsection-title" id="property-{{ property.name }}">{{ property.name }}</h4>
+        
+        {% if property.returnType %}
+        <div class="doc-item">
+            <span class="doc-item-name">Type:</span>
+            <span class="doc-item-type">{{ property.returnType }}</span>
+        </div>
+        {% endif %}
+        
+        {% if property.get %}
+        <div class="doc-item">
+            <h5>Getter</h5>
+            {% if property.get.implementation %}
+            <pre><code>{{ property.get.implementation }}</code></pre>
+            {% else %}
+            <p>No implementation provided.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if property.set %}
+        <div class="doc-item">
+            <h5>Setter</h5>
+            {% if property.set.implementation %}
+            <pre><code>{{ property.set.implementation }}</code></pre>
+            {% else %}
+            <p>No implementation provided.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
