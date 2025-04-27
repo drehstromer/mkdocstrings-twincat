@@ -40,3 +40,27 @@ This will include documentation for the `FB_Example` POU. You can also document 
 ## Requirements
 
 This handler requires the `pytwincatparser` package, which is automatically installed as a dependency.
+
+## Development
+
+### Building and Publishing
+
+This project uses [uv](https://github.com/astral-sh/uv) for building and publishing. To build and publish the package, you can use one of the provided scripts:
+
+#### Windows
+
+```powershell
+.\build_uv.ps1
+```
+
+#### Python Script
+
+```bash
+python build_uv.py
+```
+
+These scripts will:
+1. Clean up previous builds
+2. Build the package using uv
+3. Ask if you want to publish the package to PyPI
+4. Publish the package if you choose to do so
