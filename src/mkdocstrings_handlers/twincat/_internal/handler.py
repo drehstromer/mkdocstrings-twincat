@@ -14,7 +14,6 @@ from mkdocstrings_handlers.twincat._internal.config import TwincatConfig, Twinca
 
 # Import pytwincatparser
 from pytwincatparser import (
-    TwinCatLoader,
     TcPou,
     TcDut,
     TcItf,
@@ -25,6 +24,12 @@ from pytwincatparser import (
     TcVariable,
     TcVariableSection,
     TcDocumentation,
+    TcObjects,
+    TcSolution,
+    TcPlcProject,
+    Twincat4024Strategy,
+    Loader
+
 )
 
 if TYPE_CHECKING:
@@ -72,8 +77,10 @@ class TwincatHandler(BaseHandler):
         """The global configuration options."""
 
         self._collected: dict[str, CollectorItem] = {}
-        self._loader: Optional[TwinCatLoader] = None
-        self._tc_objects: List[Tuple[str, Any]] = []
+        self._twincat_loader: Loader = Loader()
+
+        search_path = options.extra.get("search_path", "")
+        self._tc_objects: List[TcObjects] = []
 
     def get_options(self, local_options: Mapping[str, Any]) -> HandlerOptions:
         """Get combined default, global and local options.
@@ -91,13 +98,13 @@ class TwincatHandler(BaseHandler):
         except Exception as error:
             raise PluginError(f"Invalid options: {error}") from error
 
-    def _initialize_loader(self, options: TwincatOptions) -> None:
-        """Initialize the TwinCatLoader if it hasn't been initialized yet.
+    def _initialize_strategy(self, options: TwincatOptions) -> None:
+        """Initialize the TwinCAT strategy if it hasn't been initialized yet.
 
         Arguments:
             options: The configuration options.
         """
-        if self._loader is None:
+        if self._strategy is None:
             search_path = options.extra.get("search_path", "")
             if not search_path:
                 raise CollectionError("No search_path specified in options.extra")
@@ -106,12 +113,15 @@ class TwincatHandler(BaseHandler):
             if not os.path.isabs(search_path):
                 search_path = os.path.join(self.base_dir, search_path)
 
-            _logger.info(f"Initializing TwinCatLoader with search_path: {search_path}")
-            self._loader = TwinCatLoader(
-                search_path=search_path,
-                tcObjects=self._tc_objects
-            )
-            self._loader.load()
+            # Register the default strategy
+            add_strategy(Twincat4024Strategy)
+            
+            # Use the default strategy
+            self._strategy = Twincat4024Strategy()
+            
+            # Load objects from the search path
+            _logger.info(f"Loading TwinCAT objects from search_path: {search_path}")
+            self._tc_objects = self._strategy.load_objects(Path(search_path))
             _logger.info(f"Loaded {len(self._tc_objects)} TwinCAT objects")
 
     def collect(self, identifier: str, options: TwincatOptions) -> CollectorItem:
@@ -129,15 +139,44 @@ class TwincatHandler(BaseHandler):
         """
         _logger.info(f"Collecting data for identifier: {identifier}")
 
-        # Initialize the loader if it hasn't been initialized yet
-        self._initialize_loader(options)
+        # Initialize the strategy if it hasn't been initialized yet
+        self._initialize_strategy(options)
 
         # Check if we've already collected this identifier
         if identifier in self._collected:
             return self._collected[identifier]
 
-        # Get the object from the loader
-        obj = self._loader.getItemByName(identifier)
+        # Find the object by name in the loaded objects
+        obj = None
+        for tc_obj in self._tc_objects:
+            if tc_obj.name == identifier:
+                obj = tc_obj
+                break
+            
+            # Check for nested objects (methods, properties)
+            if hasattr(tc_obj, 'methods') and tc_obj.methods:
+                if '.' in identifier:
+                    parent_name, item_name = identifier.split('.', 1)
+                    if tc_obj.name == parent_name:
+                        for method in tc_obj.methods:
+                            if method.name == item_name:
+                                obj = method
+                                break
+                        if obj:
+                            break
+            
+            # Check for properties
+            if hasattr(tc_obj, 'properties') and tc_obj.properties:
+                if '.' in identifier:
+                    parent_name, item_name = identifier.split('.', 1)
+                    if tc_obj.name == parent_name:
+                        for prop in tc_obj.properties:
+                            if prop.name == item_name:
+                                obj = prop
+                                break
+                        if obj:
+                            break
+
         if obj is None:
             raise CollectionError(f"Could not find object with identifier: {identifier}")
 
@@ -146,7 +185,7 @@ class TwincatHandler(BaseHandler):
             path=identifier,
             name=identifier.split(".")[-1] if "." in identifier else identifier,
             obj=obj,
-            relative_file_path=None,
+            relative_file_path=str(obj.path) if hasattr(obj, 'path') and obj.path else None,
             relative_line_start=None,
             relative_line_end=None,
         )
