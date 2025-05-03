@@ -1,8 +1,8 @@
-{% block title %}{{ obj.name }} - TwinCAT DUT Documentation{% endblock %}
+{% block title %}{{ data.name }} - TwinCAT DUT Documentation{% endblock %}
 
 {% block content %}
 <div class="doc-section">
-    <h1 class="doc-section-title">{{ obj.name }}</h1>
+    <h1 class="doc-section-title">{{ data.name }}</h1>
     
     <div class="doc-item">
         <span class="badge badge-success">DUT</span>
@@ -10,10 +10,10 @@
     
     {% include "tcdocumentation.html.jinja" %}
     
-    {% if obj.declaration %}
+    {% if data.declaration %}
     <div class="doc-section">
         <h3 class="doc-section-title">Declaration</h3>
-        <pre><code>{{ obj.declaration }}</code></pre>
+        <pre><code>{{ data.declaration }}</code></pre>
     </div>
     {% endif %}
     

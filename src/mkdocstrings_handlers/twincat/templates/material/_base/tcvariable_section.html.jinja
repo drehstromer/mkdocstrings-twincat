@@ -1,8 +1,8 @@
-{% if obj.variable_sections %}
+{% if data.variable_sections %}
 <div class="doc-section">
     <h3 class="doc-section-title">Variables</h3>
     
-    {% for section in obj.variable_sections %}
+    {% for section in data.variable_sections %}
     <div class="doc-subsection">
         <h4 class="doc-subsection-title">{{ section.section_type }}</h4>
         

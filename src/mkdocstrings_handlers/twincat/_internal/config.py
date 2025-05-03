@@ -35,6 +35,7 @@ try:
     if getattr(pydantic, "__version__", "1.").startswith("1."):
         raise ImportError  # noqa: TRY301
 
+    # YORE: EOL 3.9: Remove block.
     if sys.version_info < (3, 10):
         try:
             import eval_type_backport  # noqa: F401
@@ -171,7 +172,17 @@ class TwincatOptions(TwincatInputOptions):  # type: ignore[override,unused-ignor
 # YORE: EOL 3.9: Replace `**_dataclass_options` with `frozen=True, kw_only=True` within line.
 @dataclass(**_dataclass_options)
 class TwincatInputConfig:
+
     """Twincat handler configuration."""
+    paths: Annotated[
+        list[str],
+        _Field(description="The paths to the twincat files."),
+    ] = field(default_factory=lambda: ["."])
+
+    default_strategy: Annotated[
+        str | None,
+        _Field(description="Strategy to parse the files"),
+    ] = None
 
     # We want to validate options early, so we load them as `TwincatInputOptions`.
     options: Annotated[
@@ -195,9 +206,13 @@ class TwincatInputConfig:
 class TwincatConfig(TwincatInputConfig):  # type: ignore[override,unused-ignore]
     """Twincat handler configuration."""
 
-    # We want to keep a simple dictionary in order to later merge global and local options.
-    options: dict[str, Any] = field(default_factory=dict)  # type: ignore[assignment]
-    """Global options in mkdocs.yml."""
+
+
+
+    options: Annotated[
+        dict[str, Any],
+        _Field(description="Configuration options for collecting and rendering objects."),
+    ] = field(default_factory=dict)  # type: ignore[assignment]
 
     @classmethod
     def coerce(cls, **data: Any) -> MutableMapping[str, Any]:

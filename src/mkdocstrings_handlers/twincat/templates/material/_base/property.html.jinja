@@ -1,8 +1,8 @@
-{% if obj.properties %}
+{% if data.properties %}
 <div class="doc-section">
     <h3 class="doc-section-title">Properties</h3>
     
-    {% for property in obj.properties %}
+    {% for property in data.properties %}
     <div class="doc-subsection">
         <h4 class="doc-subsection-title" id="property-{{ property.name }}">{{ property.name }}</h4>
         

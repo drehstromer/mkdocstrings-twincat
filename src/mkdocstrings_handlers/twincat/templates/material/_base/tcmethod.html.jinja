@@ -15,7 +15,7 @@
     
     {% if method.documentation %}
     <div class="doc-item">
-        {% set obj = method %}
+        {% set data = method %}
         {% include "tcdocumentation.html.jinja" %}
     </div>
     {% endif %}
@@ -29,7 +29,7 @@
     
     {% if method.variable_sections %}
     <div class="doc-item">
-        {% set obj = method %}
+        {% set data = method %}
         {% include "tcvariable_section.html.jinja" %}
     </div>
     {% endif %}

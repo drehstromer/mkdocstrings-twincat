@@ -1,8 +1,8 @@
-{% if obj.methods %}
+{% if data.methods %}
 <div class="doc-section">
     <h3 class="doc-section-title">Methods</h3>
     
-    {% for method in obj.methods %}
+    {% for method in data.methods %}
     <div class="doc-subsection">
         <h4 class="doc-subsection-title" id="method-{{ method.name }}">
             {{ method.name }}
@@ -20,14 +20,14 @@
         
         {% if method.documentation %}
         <div class="doc-item">
-            {% set obj = method %}
+            {% set data = method %}
             {% include "documentation.html" %}
         </div>
         {% endif %}
         
         {% if method.variable_sections %}
         <div class="doc-item">
-            {% set obj = method %}
+            {% set data = method %}
             {% include "variable_section.html" %}
         </div>
         {% endif %}

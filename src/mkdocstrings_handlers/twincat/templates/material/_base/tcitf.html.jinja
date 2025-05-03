@@ -1,17 +1,17 @@
-{% block title %}{{ obj.name }} - TwinCAT Interface Documentation{% endblock %}
+{% block title %}{{ data.name }} - TwinCAT Interface Documentation{% endblock %}
 
 {% block content %}
 <div class="doc-section">
-    <h1 class="doc-section-title">{{ obj.name }}</h1>
+    <h1 class="doc-section-title">{{ data.name }}</h1>
     
     <div class="doc-item">
         <span class="badge badge-info">Interface</span>
         
-        {% if obj.extends %}
+        {% if data.extends %}
         <div class="doc-item">
             <span class="doc-item-name">Extends:</span>
             <ul>
-                {% for interface in obj.extends %}
+                {% for interface in data.extends %}
                 <li>{{ interface }}</li>
                 {% endfor %}
             </ul>
@@ -19,28 +19,28 @@
         {% endif %}
     </div>
     
-    {% if obj.declaration %}
+    {% if data.declaration %}
     <div class="doc-section">
         <h3 class="doc-section-title">Declaration</h3>
-        <pre><code>{{ obj.declaration }}</code></pre>
+        <pre><code>{{ data.declaration }}</code></pre>
     </div>
     {% endif %}
     
-    {% if obj.methods %}
+    {% if data.methods %}
     <div class="doc-section">
         <h3 class="doc-section-title">Methods</h3>
         
-        {% for method in obj.methods %}
+        {% for method in data.methods %}
             {% include "tcmethod.html.jinja" %}
         {% endfor %}
     </div>
     {% endif %}
     
-    {% if obj.properties %}
+    {% if data.properties %}
     <div class="doc-section">
         <h3 class="doc-section-title">Properties</h3>
         
-        {% for property in obj.properties %}
+        {% for property in data.properties %}
             {% include "tcproperty.html.jinja" %}
         {% endfor %}
     </div>
