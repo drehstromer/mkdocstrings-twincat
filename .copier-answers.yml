@@ -1,11 +1,11 @@
 # Changes here will be overwritten by Copier.
-_commit: 1.4.0
+_commit: 1.4.4
 _src_path: gh:mkdocstrings/handler-template
 author_email: privat@samuelruckli.ch
-author_fullname: Samuel Ruckli
+author_fullname: drehstromer
 author_username: drehstromer
 copyright_date: '2025'
-copyright_holder: Samuel Ruckli
+copyright_holder: drehstromer
 copyright_holder_email: privat@samuelruckli.ch
 copyright_license: MIT
 insiders: false

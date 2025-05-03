@@ -1,87 +1,151 @@
 # Customization
 
-This page explains how to customize the TwinCAT handler for mkdocstrings.
+It is possible to customize the output of the generated documentation with CSS
+and/or by overriding templates.
+
+## CSS classes
+
+Our templates add [CSS](https://www.w3schools.com/Css/) classes to many HTML elements
+to make it possible for users to customize the resulting look and feel.
+
+To add CSS rules and style mkdocstrings' output,
+put them in a CSS file in your docs folder, for example in `docs/css/mkdocstrings.css`,
+and reference this file in [MkDocs' `extra_css` configuration option](https://www.mkdocs.org/user-guide/configuration/#extra_css):
+
+```yaml title="mkdocs.yml"
+extra_css:
+- css/mkdocstrings.css
+```
+
+Example:
+
+```css title="docs/css/mkdocstrings.css"
+.doc-section-title {
+  font-weight: bold;
+}
+```
+
+## Symbol types
+
+### Colors
+
+You can customize the colors of the symbol types
+(see [`show_symbol_type_heading`][show_symbol_type_heading] and [`show_symbol_type_toc`][show_symbol_type_toc])
+by overriding the values of our CSS variables, for example:
+
+```css title="docs/css/mkdocstrings.css"
+[data-md-color-scheme="default"] {
+  --doc-symbol-data-fg-color: #d1b619;
+
+  --doc-symbol-data-bg-color: #d1b6191a;
+}
+
+[data-md-color-scheme="slate"] {
+  --doc-symbol-data-fg-color: #46c2cb;
+
+  --doc-symbol-data-bg-color: #46c2cb1a;
+}
+```
+
+The `[data-md-color-scheme="*"]` selectors work with the [Material for MkDocs] theme.
+If you are using another theme, adapt the selectors to this theme
+if it supports light and dark themes,
+otherwise just override the variables at root level:
+
+```css title="docs/css/mkdocstrings.css"
+:root {
+  --doc-symbol-data-fg-color: #d1b619;
+
+  --doc-symbol-data-bg-color: #d1b6191a;
+}
+```
+
+/// admonition | Preview
+    type: preview
+
+<div id="preview-symbol-colors">
+  <style>
+    [data-md-color-scheme="default"] #preview-symbol-colors {
+      --doc-symbol-data-fg-color: #d1b619;
+
+      --doc-symbol-data-bg-color: #d1b6191a;
+    }
+
+    [data-md-color-scheme="slate"] #preview-symbol-colors {
+      --doc-symbol-data-fg-color: #46c2cb;
+
+      --doc-symbol-data-bg-color: #46c2cb1a;
+    }
+  </style>
+  <p>
+    Try cycling through the themes to see the colors for each theme:
+    <code class="doc-symbol doc-symbol-data"></code
+  </p>
+</div>
+
+///
+
+### Names
+
+You can also change the actual symbol names.
+For example, to use single letters instead of truncated types:
+
+```css title="docs/css/mkdocstrings.css"
+.doc-symbol-data::after {
+  content: "D";
+}
+```
+
+/// admonition | Preview
+    type: preview
+
+<div id="preview-symbol-names">
+  <style>
+    #preview-symbol-names .doc-symbol-data::after {
+      content: "D";
+    }
+  </style>
+  <ul>
+    <li>Data: <code class="doc-symbol doc-symbol-data"></code></li>
+  </ul>
+</div>
+
+///
 
 ## Templates
 
-The TwinCAT handler uses Jinja2 templates to render the documentation. You can customize these templates to change the appearance of the generated documentation.
+Templates are organized into the following tree:
 
-### Template Structure
+```python exec="1" result="tree"
+from pathlib import Path
 
-The templates are organized in a hierarchical structure:
-
-- `base.html.jinja`: The base template that defines the overall structure of the documentation.
-- `tcpou.html.jinja`: Template for POUs (Program Organization Units).
-- `tcdut.html.jinja`: Template for DUTs (Data Unit Types).
-- `tcitf.html.jinja`: Template for Interfaces.
-- `tcmethod.html.jinja`: Template for Methods.
-- `tcproperty.html.jinja`: Template for Properties.
-- `tcvariable_section.html.jinja`: Template for Variable Sections.
-- `tcdocumentation.html.jinja`: Template for Documentation.
-
-### Customizing Templates
-
-To customize the templates, you need to create your own templates in your project's `docs/templates` directory. The templates should have the same names as the original templates.
-
-For example, to customize the POU template, create a file at `docs/templates/tcpou.html.jinja`.
-
-Then, configure mkdocstrings to use your custom templates in your `mkdocs.yml` file:
-
-```yaml
-plugins:
-  - mkdocstrings:
-      handlers:
-        twincat:
-          options:
-            template_dir: templates
+basedir = "src/mkdocstrings_handlers/twincat/templates/material"
+print("theme/")
+for filepath in sorted(path for path in Path(basedir).rglob("*") if "_base" not in str(path) and path.suffix != ".css"):
+    print(
+        "    " * (len(filepath.relative_to(basedir).parent.parts) + 1)
+        + filepath.name
+        + ("/" if filepath.is_dir() else "")
+    )
 ```
 
-### Template Variables
+See them [in the repository](https://github.com/mkdocstrings/mkdocstrings-twincat/tree/main/src/mkdocstrings_handlers/twincat/templates/).
+See the general *mkdocstrings* documentation to learn how to override them: https://mkdocstrings.github.io/theming/#templates.
 
-The following variables are available in the templates:
+Each one of these templates extends a base version in `theme/_base`. Example:
 
-- `config`: The configuration options for the handler.
-- `data`: The object being documented (e.g., a TcPou, TcDut, TcItf, etc.).
-- `item`: The collector item containing metadata about the object.
-- `heading_level`: The initial heading level for the object.
-- `root`: A boolean indicating whether the object is the root object being documented.
-
-## CSS Styling
-
-You can customize the appearance of the generated documentation by adding your own CSS styles.
-
-### Adding Custom CSS
-
-To add custom CSS, create a CSS file in your project's `docs/css` directory, for example `docs/css/custom.css`.
-
-Then, add the CSS file to your `mkdocs.yml` file:
-
-```yaml
-extra_css:
-  - css/custom.css
+```html+jinja title="theme/data.html.jinja"
+{% extends "_base/data.html.jinja" %}
 ```
 
-### CSS Classes
+Some of these templates define [Jinja blocks](https://jinja.palletsprojects.com/en/3.0.x/templates/#template-inheritance).
+allowing to customize only *parts* of a template
+without having to fully copy-paste it into your project:
 
-The following CSS classes are used in the generated documentation:
-
-- `.doc-section`: A section of the documentation.
-- `.doc-section-title`: The title of a section.
-- `.doc-subsection`: A subsection of the documentation.
-- `.doc-subsection-title`: The title of a subsection.
-- `.doc-item`: An item in the documentation.
-- `.doc-item-name`: The name of an item.
-- `.doc-item-type`: The type of an item.
-- `.doc-item-description`: The description of an item.
-- `.doc-item-attributes`: The attributes of an item.
-- `.doc-item-value`: The value of an item.
-- `.doc-tag`: A documentation tag.
-- `.doc-tag-name`: The name of a documentation tag.
-- `.doc-tag-value`: The value of a documentation tag.
-- `.badge`: A badge.
-- `.badge-primary`: A primary badge.
-- `.badge-secondary`: A secondary badge.
-- `.badge-success`: A success badge.
-- `.badge-info`: An info badge.
-- `.badge-warning`: A warning badge.
-- `.badge-danger`: A danger badge.
+```jinja title="templates/theme/data.html"
+{% extends "_base/data.html" %}
+{% block contents scoped %}
+  {{ block.super }}
+  Additional contents
+{% endblock contents %}
+```
