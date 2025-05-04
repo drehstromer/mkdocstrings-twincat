@@ -1,49 +1,155 @@
+{#- Template for TwinCAT Interfaces.
+
+This template renders a TwinCAT Interface.
+
+Context:
+  data: The Interface object to render.
+  root (bool): Whether this is the root object, injected with `:::` in a Markdown page.
+  heading_level (int): The HTML heading level to use.
+  config (dict): The configuration options.
+-#}
+
 {% block title %}{{ data.name }} - TwinCAT Interface Documentation{% endblock %}
 
 {% block content %}
-<div class="doc-section">
-    <h1 class="doc-section-title">{{ data.name }}</h1>
-    
-    <div class="doc-item">
-        <span class="badge badge-info">Interface</span>
+<div class="doc doc-object doc-interface">
+  {% with obj = data, html_id = data.get_identifier() %}
+
+    {% if root %}
+      {% set show_full_path = config.show_root_full_path %}
+      {% set root_members = True %}
+    {% elif root_members %}
+      {% set show_full_path = config.show_root_members_full_path or config.show_object_full_path %}
+      {% set root_members = False %}
+    {% else %}
+      {% set show_full_path = config.show_object_full_path %}
+    {% endif %}
+
+    {% set interface_name = data.get_identifier() if show_full_path else data.name %}
+
+    {% if not root or config.show_root_heading %}
+      {% filter heading(
+          heading_level,
+          role="interface",
+          id=html_id,
+          class="doc doc-heading",
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-interface"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+        ) %}
+
+        {% block heading scoped %}
+          {#- Heading block.
+
+          This block renders the heading for the Interface.
+          -#}
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-interface"></code>{% endif %}
+          <span class="doc doc-object-name doc-interface-name">{{ config.heading if config.heading and root else interface_name }}</span>
+        {% endblock heading %}
+
+        {% block labels scoped %}
+          {#- Labels block.
+
+          This block renders the labels for the Interface.
+          -#}
+          <span class="doc doc-label doc-label-interface">Interface</span>
+        {% endblock labels %}
+
+      {% endfilter %}
+    {% else %}
+      {% if config.show_root_toc_entry %}
+        {% filter heading(heading_level,
+            role="interface",
+            id=html_id,
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-interface"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+            hidden=True,
+          ) %}
+        {% endfilter %}
+      {% endif %}
+      {% set heading_level = heading_level - 1 %}
+    {% endif %}
+
+    <div class="doc doc-contents {% if root %}first{% endif %}">
+      {% block contents scoped %}
+        {#- Contents block.
+
+        This block renders the contents of the Interface.
+        It contains other blocks that users can override.
+        Overriding the contents block allows to rearrange the order of the blocks.
+        -#}
         
-        {% if data.extends %}
-        <div class="doc-item">
-            <span class="doc-item-name">Extends:</span>
-            <ul>
-                {% for interface in data.extends %}
-                <li>{{ interface }}</li>
+        {% block inheritance scoped %}
+          {#- Inheritance block.
+
+          This block renders the inheritance information for the Interface.
+          -#}
+          {% if data.extends %}
+            <p class="doc doc-interface-extends">
+              Extends: 
+              {% for interface in data.extends -%}
+                <code>{{ interface }}</code>{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+        {% endblock inheritance %}
+
+        {% block docstring scoped %}
+          {#- Docstring block.
+
+          This block renders the documentation for the Interface.
+          -#}
+          {% include "tcdocumentation.html.jinja" %}
+        {% endblock docstring %}
+
+        {% block declaration scoped %}
+          {#- Declaration block.
+
+          This block renders the declaration for the Interface.
+          -#}
+          {% if data.declaration %}
+            <div class="doc doc-section">
+              <h{{ heading_level + 1 }} class="doc doc-heading">Declaration</h{{ heading_level + 1 }}>
+              <div class="doc doc-contents">
+                <pre><code class="language-twincat">{{ data.declaration }}</code></pre>
+              </div>
+            </div>
+          {% endif %}
+        {% endblock declaration %}
+
+        {% block methods scoped %}
+          {#- Methods block.
+
+          This block renders the methods for the Interface.
+          -#}
+          {% if data.methods %}
+            <div class="doc doc-section">
+              <h{{ heading_level + 1 }} class="doc doc-heading">Methods</h{{ heading_level + 1 }}>
+              <div class="doc doc-contents">
+                {% for method in data.methods %}
+                  {% include "tcmethod.html.jinja" %}
                 {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        {% endblock methods %}
+
+        {% block properties scoped %}
+          {#- Properties block.
+
+          This block renders the properties for the Interface.
+          -#}
+          {% if data.properties %}
+            <div class="doc doc-section">
+              <h{{ heading_level + 1 }} class="doc doc-heading">Properties</h{{ heading_level + 1 }}>
+              <div class="doc doc-contents">
+                {% for property in data.properties %}
+                  {% include "tcproperty.html.jinja" %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endblock properties %}
+      {% endblock contents %}
     </div>
-    
-    {% if data.declaration %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Declaration</h3>
-        <pre><code>{{ data.declaration }}</code></pre>
-    </div>
-    {% endif %}
-    
-    {% if data.methods %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Methods</h3>
-        
-        {% for method in data.methods %}
-            {% include "tcmethod.html.jinja" %}
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    {% if data.properties %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Properties</h3>
-        
-        {% for property in data.properties %}
-            {% include "tcproperty.html.jinja" %}
-        {% endfor %}
-    </div>
-    {% endif %}
+
+  {% endwith %}
 </div>
 {% endblock %}

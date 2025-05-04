@@ -1,64 +1,170 @@
-{% block title %}{{ data.name }} - TwinCAT POU Documentation{% endblock %}
+{#- Template for TwinCAT POUs (Program Organization Units).
 
-{% block content %}
-<div class="doc-section">
-    <h1 class="doc-section-title">{{ data.name }}</h1>
-    
-    <div class="doc-item">
-        <span class="badge badge-primary">POU</span>
-        {% if data.extends %}
-        <span class="doc-item-name">Extends:</span>
-        <span class="doc-item-type">{{ data.extends }}</span>
-        {% endif %}
+This template renders a TwinCAT POU (Function Block, Program, or Function).
+
+Context:
+  data: The POU object to render.
+  root (bool): Whether this is the root object, injected with `:::` in a Markdown page.
+  heading_level (int): The HTML heading level to use.
+  config (dict): The configuration options.
+-#}
+
+
+<div class="doc doc-object doc-pou">
+  {% with obj = data, html_id = data.get_identifier() %}
+
+    {% if root %}
+      {% set show_full_path = config.show_root_full_path %}
+      {% set root_members = True %}
+    {% elif root_members %}
+      {% set show_full_path = config.show_root_members_full_path or config.show_object_full_path %}
+      {% set root_members = False %}
+    {% else %}
+      {% set show_full_path = config.show_object_full_path %}
+    {% endif %}
+
+    {% set pou_name = data.get_identifier() if show_full_path else data.name %}
+
+    {% if not root or config.show_root_heading %}
+      {% filter heading(
+          heading_level,
+          role="pou",
+          id=html_id,
+          class="doc doc-heading",
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-pou"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+        ) %}
+
+        {% block heading scoped %}
+          {#- Heading block.
+
+          This block renders the heading for the POU.
+          -#}
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-pou"></code>{% endif %}
+          <span class="doc doc-object-name doc-pou-name">{{ config.heading if config.heading and root else pou_name }}</span>
+        {% endblock heading %}
+
+      {% endfilter %}
+    {% else %}
+      {% if config.show_root_toc_entry %}
+        {% filter heading(heading_level,
+            role="pou",
+            id=html_id,
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-pou"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+            hidden=True,
+          ) %}
+        {% endfilter %}
+      {% endif %}
+      {% set heading_level = heading_level - 1 %}
+    {% endif %}
+
+    <div class="doc doc-contents {% if root %}first{% endif %}">
+      {% block contents scoped %}
+        {#- Contents block.
+
+        This block renders the contents of the POU.
+        It contains other blocks that users can override.
+        Overriding the contents block allows to rearrange the order of the blocks.
+        -#}
         
-        {% if data.implements %}
-        <div class="doc-item">
-            <span class="doc-item-name">Implements:</span>
-            <ul>
-                {% for interface in data.implements %}
-                <li>{{ interface }}</li>
+        {% block inheritance scoped %}
+          {#- Inheritance block.
+
+          This block renders the inheritance information for the POU.
+          -#}
+          {% if data.extends and config.show_extends %}
+            <p class="doc doc-pou-extends">
+              Extends: <code>{{ data.extends }}</code>
+            </p>
+          {% endif %}
+          
+          {% if data.implements and config.show_implements %}
+            <p class="doc doc-pou-implements">
+              Implements: 
+              {% for interface in data.implements -%}
+                <code>{{ interface }}</code>{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+        {% endblock inheritance %}
+
+        {% block docstring scoped %}
+          {#- Docstring block.
+
+          This block renders the documentation for the POU.
+          -#}
+          {% include "tcdocumentation.html.jinja"%}
+        {% endblock docstring %}
+
+
+
+        {% block variables scoped %}
+          {#- Variables block.
+
+          This block renders the variables for the POU.
+          -#}
+          {% include "tcvariable_section.html.jinja"%}
+        {% endblock variables %}
+
+
+        {% block declaration scoped %}
+          {#- declaration block.
+
+          This block renders the declaration for the POU.
+          -#}
+
+          {% if data.declaration and config.show_source %}
+            <details class="quote">
+              <summary>"Declaration" </summary>
+              {{ data.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
+            </details>
+          {% endif %}
+        {% endblock declaration %}
+
+        {% block implementation scoped %}
+          {#- Implementation block.
+
+          This block renders the implementation for the POU.
+          -#}
+
+          {% if data.implementation and config.show_source %}
+            <details class="quote">
+              <summary>"Implementation" </summary>
+              {{ data.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
+            </details>
+          {% endif %}
+        {% endblock implementation %}
+
+        {% block methods scoped %}
+          {#- Methods block.
+
+          This block renders the methods for the POU.
+          -#}
+          {% if data.methods %}
+                {% for method in data.methods %}
+                  {% include "tcmethod.html.jinja" %}
                 {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+          {% endif %}
+        {% endblock methods %}
+
+        {% block properties scoped %}
+          {#- Properties block.
+
+          This block renders the properties for the POU.
+          -#}
+          {% if data.properties %}
+            <div class="doc doc-section">
+              <h{{ heading_level + 1 }} class="doc doc-heading">Properties</h{{ heading_level + 1 }}>
+              <div class="doc doc-contents">
+                {% for property in data.properties %}
+                  {% include "tcproperty.html.jinja" %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endblock properties %}
+      {% endblock contents %}
     </div>
-    
-    {% include "tcdocumentation.html.jinja" %}
-    
-    {% if data.declaration %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Declaration</h3>
-        <pre><code>{{ data.declaration }}</code></pre>
-    </div>
-    {% endif %}
-    
-    {% include "tcvariable_section.html.jinja" %}
-    
-    {% if data.implementation %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Implementation</h3>
-        <pre><code>{{ data.implementation }}</code></pre>
-    </div>
-    {% endif %}
-    
-    {% if data.methods %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Methods</h3>
-        
-        {% for method in data.methods %}
-            {% include "tcmethod.html.jinja" %}
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    {% if data.properties %}
-    <div class="doc-section">
-        <h3 class="doc-section-title">Properties</h3>
-        
-        {% for property in data.properties %}
-            {% include "tcproperty.html.jinja" %}
-        {% endfor %}
-    </div>
-    {% endif %}
+
+  {% endwith %}
 </div>
-{% endblock %}
+

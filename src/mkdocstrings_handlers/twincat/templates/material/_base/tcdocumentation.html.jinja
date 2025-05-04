@@ -1,42 +1,86 @@
+{#- Template for TwinCAT documentation.
+
+This template renders TwinCAT documentation sections.
+
+Context:
+  data: The object containing documentation to render.
+  heading_level (int): The HTML heading level to use.
+  config (dict): The configuration options.
+-#}
+
 {% if data.documentation %}
-<div class="doc-section">
-    <h3 class="doc-section-title">Documentation</h3>
-    
-    {% if data.documentation.brief %}
-    <div class="doc-tag">
-        <span class="doc-tag-name">Brief:</span>
-        <span class="doc-tag-value">{{ data.documentation.brief }}</span>
-    </div>
-    {% endif %}
-    
-    {% if data.documentation.details %}
-    <div class="doc-tag">
-        <span class="doc-tag-name">Details:</span>
-        <span class="doc-tag-value">{{ data.documentation.details }}</span>
-    </div>
-    {% endif %}
-    
-    {% if data.documentation.usage %}
-    <div class="doc-tag">
-        <span class="doc-tag-name">Usage:</span>
-        <span class="doc-tag-value">{{ data.documentation.usage }}</span>
-    </div>
-    {% endif %}
-    
-    {% if data.documentation.returns %}
-    <div class="doc-tag">
-        <span class="doc-tag-name">Returns:</span>
-        <span class="doc-tag-value">{{ data.documentation.returns }}</span>
-    </div>
-    {% endif %}
-    
-    {% if data.documentation.custom_tags %}
-    {% for tag_name, tag_value in data.documentation.custom_tags.items() %}
-    <div class="doc-tag">
-        <span class="doc-tag-name">{{ tag_name }}:</span>
-        <span class="doc-tag-value">{{ tag_value }}</span>
-    </div>
-    {% endfor %}
-    {% endif %}
+<div class="doc doc-section doc-section-title">
+  <h{{ heading_level + 1 }} class="doc doc-heading">Documentation</h{{ heading_level + 1 }}>
+  <div class="doc doc-contents">
+    {% block documentation_content scoped %}
+      {#- Documentation content block.
+
+      This block renders the content of the documentation.
+      -#}
+      
+      {% block details scoped %}
+        {#- Brief block.
+
+        This block renders the details description.
+        -#}
+        {% if data.documentation.details %}
+          <div class="doc doc-tag doc-tag-details">
+            <p class="doc doc-tag-name"><strong>Details:</strong></p>
+            <div class="doc doc-tag-value">
+              {{ data.documentation.details|convert_markdown(heading_level + 2) }}
+            </div>
+          </div>
+        {% endif %}
+      {% endblock details %}
+      
+      {% block usage scoped %}
+        {#- Details block.
+
+        This block renders the usage description.
+        -#}
+        {% if data.documentation.usage %}
+          <div class="doc doc-tag doc-tag-usage">
+            <p class="doc doc-tag-name"><strong>Usage:</strong></p>
+            <div class="doc doc-tag-value">
+              {{ data.documentation.usage|highlight(language=pascal) }}
+            </div>
+          </div>
+        {% endif %}
+      {% endblock usage %}
+      
+      {% block Return scoped %}
+        {#- Return block.
+
+        This block renders the Return information.
+        -#}
+        {% if data.documentation.returns %}
+          <div class="doc doc-tag doc-tag-returns">
+            <p class="doc doc-tag-name"><strong>Returns:</strong></p>
+            <div class="doc doc-tag-value">
+              {{ data.documentation.returns|convert_markdown(heading_level + 2) }}
+            </div>
+          </div>
+        {% endif %}
+      {% endblock Return %}
+      
+      
+      {% block custom_tags scoped %}
+        {#- Custom tags block.
+
+        This block renders any custom documentation tags.
+        -#}
+        {% if data.documentation.custom_tags %}
+          {% for tag_name, tag_value in data.documentation.custom_tags.items() %}
+            <div class="doc doc-tag doc-tag-custom">
+              <p class="doc doc-tag-name"><strong>{{ tag_name }}:</strong></p>
+              <div class="doc doc-tag-value">
+                {{ tag_value|convert_markdown(heading_level + 2)}}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endblock custom_tags %}
+    {% endblock documentation_content %}
+  </div>
 </div>
 {% endif %}

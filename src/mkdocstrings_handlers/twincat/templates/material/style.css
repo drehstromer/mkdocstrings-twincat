@@ -26,12 +26,12 @@
 }
 
 /* Parameter headings must be inline, not blocks. */
-.doc-heading-parameter {
+.doc-heading-variable {
   display: inline;
 }
 
 /* Prefer space on the right, not the left of parameter permalinks. */
-.doc-heading-parameter .headerlink {
+.doc-heading-variable .headerlink {
   margin-left: 0 !important;
   margin-right: 0.2rem;
 }
@@ -66,36 +66,37 @@
 /* Symbols in Navigation and ToC. */
 :root, :host,
 [data-md-color-scheme="default"] {
-  --doc-symbol-parameter-fg-color: #df50af;
+  --doc-symbol-variable-fg-color: #df50af;
   --doc-symbol-attribute-fg-color: #953800;
   --doc-symbol-function-fg-color: #8250df;
   --doc-symbol-method-fg-color: #8250df;
-  --doc-symbol-class-fg-color: #0550ae;
+  --doc-symbol-pou-fg-color: #0550ae;
   --doc-symbol-module-fg-color: #5cad0f;
 
-  --doc-symbol-parameter-bg-color: #df50af1a;
+  --doc-symbol-variable-bg-color: #df50af1a;
   --doc-symbol-attribute-bg-color: #9538001a;
   --doc-symbol-function-bg-color: #8250df1a;
   --doc-symbol-method-bg-color: #8250df1a;
-  --doc-symbol-class-bg-color: #0550ae1a;
+  --doc-symbol-pou-bg-color: #0550ae1a;
   --doc-symbol-module-bg-color: #5cad0f1a;
 }
 
 [data-md-color-scheme="slate"] {
-  --doc-symbol-parameter-fg-color: #ffa8cc;
+  --doc-symbol-variable-fg-color: #ffa8cc;
   --doc-symbol-attribute-fg-color: #ffa657;
   --doc-symbol-function-fg-color: #d2a8ff;
   --doc-symbol-method-fg-color: #d2a8ff;
-  --doc-symbol-class-fg-color: #79c0ff;
+  --doc-symbol-pou-fg-color: #79c0ff;
   --doc-symbol-module-fg-color: #baff79;
 
-  --doc-symbol-parameter-bg-color: #ffa8cc1a;
+  --doc-symbol-variable-bg-color: #ffa8cc1a;
   --doc-symbol-attribute-bg-color: #ffa6571a;
   --doc-symbol-function-bg-color: #d2a8ff1a;
   --doc-symbol-method-bg-color: #d2a8ff1a;
-  --doc-symbol-class-bg-color: #79c0ff1a;
+  --doc-symbol-pou-bg-color: #79c0ff1a;
   --doc-symbol-module-bg-color: #baff791a;
 }
+
 
 code.doc-symbol {
   border-radius: .1rem;
@@ -104,14 +105,14 @@ code.doc-symbol {
   font-weight: bold;
 }
 
-code.doc-symbol-parameter,
-a code.doc-symbol-parameter {
-  color: var(--doc-symbol-parameter-fg-color);
-  background-color: var(--doc-symbol-parameter-bg-color);
+code.doc-symbol-variable,
+a code.doc-symbol-variable {
+  color: var(--doc-symbol-variable-fg-color);
+  background-color: var(--doc-symbol-variable-bg-color);
 }
 
-code.doc-symbol-parameter::after {
-  content: "param";
+code.doc-symbol-variable::after {
+  content: "var";
 }
 
 code.doc-symbol-attribute,
@@ -144,14 +145,14 @@ code.doc-symbol-method::after {
   content: "meth";
 }
 
-code.doc-symbol-class,
-a code.doc-symbol-class {
-  color: var(--doc-symbol-class-fg-color);
-  background-color: var(--doc-symbol-class-bg-color);
+code.doc-symbol-pou,
+a code.doc-symbol-pou {
+  color: var(--doc-symbol-pou-fg-color);
+  background-color: var(--doc-symbol-pou-bg-color);
 }
 
-code.doc-symbol-class::after {
-  content: "class";
+code.doc-symbol-pou::after {
+  content: "pou";
 }
 
 code.doc-symbol-module,
@@ -164,7 +165,140 @@ code.doc-symbol-module::after {
   content: "mod";
 }
 
+
+
+code.doc-symbol-dut,
+a code.doc-symbol-dut {
+  color: var(--doc-symbol-dut-fg-color);
+  background-color: var(--doc-symbol-dut-bg-color);
+}
+
+code.doc-symbol-dut::after {
+  content: "dut";
+}
+
+code.doc-symbol-interface,
+a code.doc-symbol-interface {
+  color: var(--doc-symbol-interface-fg-color);
+  background-color: var(--doc-symbol-interface-bg-color);
+}
+
+code.doc-symbol-interface::after {
+  content: "itf";
+}
+
+code.doc-symbol-property,
+a code.doc-symbol-property {
+  color: var(--doc-symbol-property-fg-color);
+  background-color: var(--doc-symbol-property-bg-color);
+}
+
+code.doc-symbol-property::after {
+  content: "prop";
+}
+
 .doc-signature .autorefs {
   color: inherit;
   border-bottom: 1px dotted currentcolor;
+}
+
+/* TwinCAT specific styles */
+.doc-label {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  margin: 0 0.2rem;
+  border-radius: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+}
+
+.doc-label-pou {
+  background-color: var(--doc-symbol-pou-fg-color);
+}
+
+.doc-label-dut {
+  background-color: var(--doc-symbol-dut-fg-color);
+}
+
+.doc-label-interface {
+  background-color: var(--doc-symbol-interface-fg-color);
+}
+
+.doc-label-property {
+  background-color: var(--doc-symbol-property-fg-color);
+}
+
+.doc-label-method {
+  background-color: var(--doc-symbol-method-fg-color);
+}
+
+.doc-label-access {
+  background-color: #6c757d;
+}
+
+.doc-label-plcproject {
+  background-color: #0550ae;
+}
+
+/* TwinCAT variable table styles */
+.doc-variables {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.doc-variables th {
+  background-color: var(--md-default-fg-color--lightest);
+  padding: 0.5rem;
+  text-align: left;
+  font-weight: bold;
+}
+
+.doc-variables td {
+  padding: 0.5rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.doc-variable-name {
+  font-weight: bold;
+}
+
+.doc-variable-type code {
+  font-family: monospace;
+}
+
+.doc-variable-value code {
+  font-family: monospace;
+  color: #0550ae;
+}
+
+.doc-attribute-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.doc-attribute {
+  margin-bottom: 0.2rem;
+}
+
+/* Documentation tag styles */
+.doc-tag {
+  margin-bottom: 1rem;
+}
+
+.doc-tag-name {
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.doc-tag-value {
+  margin-left: 1rem;
+}
+
+/* Empty section message */
+.doc-empty-section {
+  font-style: italic;
+  color: var(--md-default-fg-color--light);
 }
