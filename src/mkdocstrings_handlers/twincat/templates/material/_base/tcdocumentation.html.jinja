@@ -8,7 +8,7 @@ Context:
   config (dict): The configuration options.
 -#}
 
-{% if data.documentation %}
+{% if documentation %}
 <div class="doc doc-section doc-section-title">
   <h{{ heading_level + 1 }} class="doc doc-heading">Documentation</h{{ heading_level + 1 }}>
   <div class="doc doc-contents">
@@ -23,11 +23,11 @@ Context:
 
         This block renders the details description.
         -#}
-        {% if data.documentation.details %}
+        {% if documentation.details %}
           <div class="doc doc-tag doc-tag-details">
             <p class="doc doc-tag-name"><strong>Details:</strong></p>
             <div class="doc doc-tag-value">
-              {{ data.documentation.details|convert_markdown(heading_level + 2) }}
+              {{ documentation.details|convert_markdown(heading_level + 2) }}
             </div>
           </div>
         {% endif %}
@@ -38,11 +38,11 @@ Context:
 
         This block renders the usage description.
         -#}
-        {% if data.documentation.usage %}
+        {% if documentation.usage %}
           <div class="doc doc-tag doc-tag-usage">
             <p class="doc doc-tag-name"><strong>Usage:</strong></p>
             <div class="doc doc-tag-value">
-              {{ data.documentation.usage|highlight(language=pascal) }}
+              {{ documentation.usage|highlight(language=pascal) }}
             </div>
           </div>
         {% endif %}
@@ -53,11 +53,11 @@ Context:
 
         This block renders the Return information.
         -#}
-        {% if data.documentation.returns %}
+        {% if documentation.returns %}
           <div class="doc doc-tag doc-tag-returns">
             <p class="doc doc-tag-name"><strong>Returns:</strong></p>
             <div class="doc doc-tag-value">
-              {{ data.documentation.returns|convert_markdown(heading_level + 2) }}
+              {{ documentation.returns|convert_markdown(heading_level + 2) }}
             </div>
           </div>
         {% endif %}
@@ -69,8 +69,8 @@ Context:
 
         This block renders any custom documentation tags.
         -#}
-        {% if data.documentation.custom_tags %}
-          {% for tag_name, tag_value in data.documentation.custom_tags.items() %}
+        {% if documentation.custom_tags %}
+          {% for tag_name, tag_value in documentation.custom_tags.items() %}
             <div class="doc doc-tag doc-tag-custom">
               <p class="doc doc-tag-name"><strong>{{ tag_name }}:</strong></p>
               <div class="doc doc-tag-value">

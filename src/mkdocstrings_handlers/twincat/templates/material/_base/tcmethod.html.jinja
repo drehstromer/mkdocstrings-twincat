@@ -11,7 +11,7 @@ Context:
 
 
 <div class="doc doc-object doc-method">
-  {% with obj = method, html_id = "method-" ~ method.name %}
+  {% with obj = method, html_id = method.get_identifier() %}
 
     {% if root %}
       {% set show_full_path = config.show_root_full_path %}
@@ -24,15 +24,14 @@ Context:
     {% endif %}
 
     {% set method_name = method.get_identifier() if show_full_path else method.name %}
-    {% set symbol_type = "method" %}
-
+    
     {% if not root or config.show_root_heading %}
       {% filter heading(
           heading_level,
-          role="meth",
+          role="method",
           id=html_id,
           class="doc doc-heading",
-          toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else method.name),
+          toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else method.name),
         ) %}
 
         {% block heading scoped %}
@@ -40,7 +39,7 @@ Context:
 
           This block renders the heading for the function.
           -#}
-          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-{{ symbol_type }}"></code>{% endif %}
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>{% endif %}
             <span class="doc doc-object-name doc-method-name">{{ config.heading if config.heading and root else method_name }}</span>
         {% endblock heading %}
 
@@ -54,7 +53,7 @@ Context:
             heading_level,
             role="meth",
             id=html_id,
-            toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else method.name),
+            toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else method.name),
             hidden=True,
           ) %}
         {% endfilter %}
@@ -97,7 +96,9 @@ Context:
 
           This block renders the documentation for the method.
           -#}
-          {% include "tcdocumentation.html.jinja"%}
+            {% with documentation=method.documentation %}
+                {% include "tcdocumentation.html.jinja"%}
+            {% endwith %}     
         {% endblock docstring %}
 
         {% block variables scoped %}
@@ -105,7 +106,9 @@ Context:
 
           This block renders the variables for the POU.
           -#}
-          {% include "tcvariable_section.html.jinja"%}
+            {% with variable_sections=method.variable_sections %}
+                {% include "tcvariable_section.html.jinja"%}
+            {% endwith %}   
         {% endblock variables %}
 
 

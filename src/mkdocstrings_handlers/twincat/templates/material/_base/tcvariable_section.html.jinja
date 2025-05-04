@@ -9,8 +9,8 @@ Context:
 -#}
 
 
-{% if data.variable_sections %}
-    {% for section in data.variable_sections %}
+{% if variable_sections %}
+    {% for section in variable_sections %}
         {% if config.variable_section_style == "table" %}
         {% block table_style scoped %}
             {#- Block for the `table` section style. -#}

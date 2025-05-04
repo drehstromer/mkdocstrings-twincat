@@ -67,14 +67,14 @@
 :root, :host,
 [data-md-color-scheme="default"] {
   --doc-symbol-variable-fg-color: #df50af;
-  --doc-symbol-attribute-fg-color: #953800;
+  --doc-symbol-property-fg-color: #953800;
   --doc-symbol-function-fg-color: #8250df;
   --doc-symbol-method-fg-color: #8250df;
   --doc-symbol-pou-fg-color: #0550ae;
   --doc-symbol-module-fg-color: #5cad0f;
 
   --doc-symbol-variable-bg-color: #df50af1a;
-  --doc-symbol-attribute-bg-color: #9538001a;
+  --doc-symbol-property-bg-color: #9538001a;
   --doc-symbol-function-bg-color: #8250df1a;
   --doc-symbol-method-bg-color: #8250df1a;
   --doc-symbol-pou-bg-color: #0550ae1a;
@@ -83,14 +83,14 @@
 
 [data-md-color-scheme="slate"] {
   --doc-symbol-variable-fg-color: #ffa8cc;
-  --doc-symbol-attribute-fg-color: #ffa657;
+  --doc-symbol-property-fg-color: #ffa657;
   --doc-symbol-function-fg-color: #d2a8ff;
   --doc-symbol-method-fg-color: #d2a8ff;
   --doc-symbol-pou-fg-color: #79c0ff;
   --doc-symbol-module-fg-color: #baff79;
 
   --doc-symbol-variable-bg-color: #ffa8cc1a;
-  --doc-symbol-attribute-bg-color: #ffa6571a;
+  --doc-symbol-property-bg-color: #ffa6571a;
   --doc-symbol-function-bg-color: #d2a8ff1a;
   --doc-symbol-method-bg-color: #d2a8ff1a;
   --doc-symbol-pou-bg-color: #79c0ff1a;
@@ -115,14 +115,14 @@ code.doc-symbol-variable::after {
   content: "var";
 }
 
-code.doc-symbol-attribute,
-a code.doc-symbol-attribute {
-  color: var(--doc-symbol-attribute-fg-color);
-  background-color: var(--doc-symbol-attribute-bg-color);
+code.doc-symbol-property,
+a code.doc-symbol-property {
+  color: var(--doc-symbol-property-fg-color);
+  background-color: var(--doc-symbol-property-bg-color);
 }
 
-code.doc-symbol-attribute::after {
-  content: "attr";
+code.doc-symbol-property::after {
+  content: "prop";
 }
 
 code.doc-symbol-function,
@@ -185,16 +185,6 @@ a code.doc-symbol-interface {
 
 code.doc-symbol-interface::after {
   content: "itf";
-}
-
-code.doc-symbol-property,
-a code.doc-symbol-property {
-  color: var(--doc-symbol-property-fg-color);
-  background-color: var(--doc-symbol-property-bg-color);
-}
-
-code.doc-symbol-property::after {
-  content: "prop";
 }
 
 .doc-signature .autorefs {
@@ -273,13 +263,13 @@ code.doc-symbol-property::after {
   color: #0550ae;
 }
 
-.doc-attribute-list {
+.doc-property-list {
   list-style-type: none;
   padding-left: 0;
   margin: 0;
 }
 
-.doc-attribute {
+.doc-property {
   margin-bottom: 0.2rem;
 }
 

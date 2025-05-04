@@ -3,129 +3,124 @@
 This template renders a TwinCAT property.
 
 Context:
-  property: The property object to render.
+  method: The method object to render.
   heading_level (int): The HTML heading level to use.
   config (dict): The configuration options.
 -#}
 
-<div class="doc doc-object doc-property">
-  {% with obj = property, html_id = "property-" ~ property.name %}
 
-    {% filter heading(
-        heading_level + 2,
-        role="property",
-        id=html_id,
-        class="doc doc-heading",
-      ) %}
 
-      {% block heading scoped %}
-        {#- Heading block.
+<div class="doc doc-object doc-method">
+  {% with obj = property, html_id = property.get_identifier() %}
 
-        This block renders the heading for the property.
-        -#}
-        <span class="doc doc-object-name doc-property-name">{{ property.name }}</span>
-      {% endblock heading %}
+    {% if root %}
+      {% set show_full_path = config.show_root_full_path %}
+      {% set root_members = True %}
+    {% elif root_members %}
+      {% set show_full_path = config.show_root_members_full_path or config.show_object_full_path %}
+      {% set root_members = False %}
+    {% else %}
+      {% set show_full_path = config.show_object_full_path %}
+    {% endif %}
 
-    {% endfilter %}
+    {% set property_name = property.get_identifier() if show_full_path else property.name %}
+    {% set symbol_type = "property" %}
 
-    <div class="doc doc-contents">
+    {% if not root or config.show_root_heading %}
+      {% filter heading(
+          heading_level,
+          role="prop",
+          id=html_id,
+          class="doc doc-heading",
+          toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else property.name),
+        ) %}
+
+        {% block heading scoped %}
+          {#- Heading block.
+
+          This block renders the heading for the property.
+          -#}
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-{{ symbol_type }}"></code>{% endif %}
+            <span class="doc doc-object-name doc-property-name">{{ config.heading if config.heading and root else property_name }}</span>
+        {% endblock heading %}
+
+        {% endfilter %}
+
+
+    {% else %}
+
+      {% if config.show_root_toc_entry %}
+        {% filter heading(
+            heading_level,
+            role="prop",
+            id=html_id,
+            toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else property.name),
+            hidden=True,
+          ) %}
+        {% endfilter %}
+      {% endif %}
+      {% set heading_level = heading_level - 1 %}
+    {% endif %}
+
+
+    <div class="doc doc-contents {% if root %}first{% endif %}">
       {% block contents scoped %}
         {#- Contents block.
 
-        This block renders the contents of the property.
+        This block renders the contents of the POU.
         It contains other blocks that users can override.
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
         
-        {% block property_type scoped %}
-          {#- Property type block.
-
-          This block renders the type for the property.
-          -#}
-          {% if property.returnType %}
-            <p class="doc doc-property-type">
-              <span class="doc-label">Type:</span> <code>{{ property.returnType }}</code>
+          
+        {% block Return scoped %}
+          {% if property.returnType and config.show_return %}
+            <p class="doc doc-property-return">
+                Return: <code>{{ property.returnType }}</code>
             </p>
           {% endif %}
-        {% endblock property_type %}
+        {% endblock Return %}
 
         {% block docstring scoped %}
           {#- Docstring block.
 
-          This block renders the documentation for the property.
+          This block renders the documentation for the method.
           -#}
-          {% if property.documentation %}
-            {% with data = property %}
-              {% include "tcdocumentation.html.jinja" %}
-            {% endwith %}
-          {% endif %}
+            {% with documentation=property.documentation %}
+                {% include "tcdocumentation.html.jinja"%}
+            {% endwith %}     
         {% endblock docstring %}
 
-        {% block getter scoped %}
-          {#- Getter block.
 
-          This block renders the getter for the property.
+        {% block set_implementation scoped %}
+          {#- Implementation block.
+
+          This block renders the implementation for the POU.
           -#}
-          {% if property.get %}
-            <div class="doc doc-section">
-              <h{{ heading_level + 3 }} class="doc doc-heading">Getter</h{{ heading_level + 3 }}>
-              <div class="doc doc-contents">
-                {% if property.get.declaration %}
-                  <div class="doc doc-subsection">
-                    <h{{ heading_level + 4 }} class="doc doc-heading">Declaration</h{{ heading_level + 4 }}>
-                    <div class="doc doc-contents">
-                      <pre><code class="language-twincat">{{ property.get.declaration }}</code></pre>
-                    </div>
-                  </div>
-                {% endif %}
-                
-                <div class="doc doc-subsection">
-                  <h{{ heading_level + 4 }} class="doc doc-heading">Implementation</h{{ heading_level + 4 }}>
-                  <div class="doc doc-contents">
-                    {% if property.get.implementation %}
-                      <pre><code class="language-twincat">{{ property.get.implementation }}</code></pre>
-                    {% else %}
-                      <p class="doc doc-empty-section">No implementation provided.</p>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
+
+          {% if property.get and property.get.implementation and config.show_source %}
+            <details class="quote">
+              <summary>"Get Implementation" </summary>
+              {{ property.get.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
+            </details>
           {% endif %}
-        {% endblock getter %}
+        {% endblock set_implementation %}
 
-        {% block setter scoped %}
-          {#- Setter block.
 
-          This block renders the setter for the property.
+        {% block get_implementation scoped %}
+          {#- Implementation block.
+
+          This block renders the implementation for the POU.
           -#}
-          {% if property.set %}
-            <div class="doc doc-section">
-              <h{{ heading_level + 3 }} class="doc doc-heading">Setter</h{{ heading_level + 3 }}>
-              <div class="doc doc-contents">
-                {% if property.set.declaration %}
-                  <div class="doc doc-subsection">
-                    <h{{ heading_level + 4 }} class="doc doc-heading">Declaration</h{{ heading_level + 4 }}>
-                    <div class="doc doc-contents">
-                      <pre><code class="language-twincat">{{ property.set.declaration }}</code></pre>
-                    </div>
-                  </div>
-                {% endif %}
-                
-                <div class="doc doc-subsection">
-                  <h{{ heading_level + 4 }} class="doc doc-heading">Implementation</h{{ heading_level + 4 }}>
-                  <div class="doc doc-contents">
-                    {% if property.set.implementation %}
-                      <pre><code class="language-twincat">{{ property.set.implementation }}</code></pre>
-                    {% else %}
-                      <p class="doc doc-empty-section">No implementation provided.</p>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
+
+          {% if property.set and property.set.implementation and config.show_source %}
+            <details class="quote">
+              <summary>"Set Implementation" </summary>
+              {{ property.set.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
+            </details>
           {% endif %}
-        {% endblock setter %}
+        {% endblock get_implementation %}
+
       {% endblock contents %}
     </div>
 
