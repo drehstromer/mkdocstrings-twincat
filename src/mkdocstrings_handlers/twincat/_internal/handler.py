@@ -7,7 +7,7 @@ import os
 import posixpath
 import sys
 from contextlib import suppress
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import TYPE_CHECKING, Any, ClassVar, List
 
 from pytwincatparser import Loader,get_strategy, TcObjects, BaseStrategy, get_default_strategy
@@ -87,32 +87,21 @@ class TwincatHandler(BaseHandler):
         self._strategy = strategy()
         self._loader: Loader = Loader(loader_strategy=self._strategy)
         
-        paths = config.paths or []
+        paths:List[Path] = []
 
-        # Expand paths with glob patterns.
-        with chdir(str(base_dir)):
-            resolved_globs = [glob.glob(path) for path in paths]
-        paths = [path for glob_list in resolved_globs for path in glob_list]
+        for path in config.paths:
+            _path = Path(PureWindowsPath(path))
+            if _path.resolve().is_file():
+                paths.append(_path.resolve())
+                _logger.info(f"filepath: {_path.resolve()} is appended and resolved")
+            else:
+                _logger.info(f"filepath: {_path.resolve()} is not appended and resolved")
+                _logger.error("No directories are supported, specify a file!")
 
-        # By default, add the base directory to the search paths.
-        if not paths:
-            paths.append(str(base_dir))
 
-        # Initialize search paths from `sys.path`, eliminating empty paths.
-        search_paths = [path for path in sys.path if path]
 
-        for path in reversed(paths):
-            # If it's not absolute, make path relative to the config file path, then make it absolute.
-            if not os.path.isabs(path):
-                path = os.path.abspath(base_dir / path)  # noqa: PLW2901
-            # Remove pre-listed paths.
-            if path in search_paths:
-                search_paths.remove(path)
-            # Give precedence to user-provided paths.
-            search_paths.insert(0, path)
-
-        self._paths = search_paths
-
+        self._paths = paths
+        _logger.info(f"Search Paths: {self._paths}")
         self.load_all_objects(paths=self._paths)
         _logger.info(f"Parsed {len(self._collected)} twincat objects")
         

@@ -48,7 +48,9 @@ def do_get_template(env: Environment, obj: CollectorItem) -> str:
         A template name.
     """
 
-    name = obj.__class__.__name__
+    name:str = obj.__class__.__name__
+    name = name.lower()
+
 
     try:
         template = env.get_template(f"{name}.html")
