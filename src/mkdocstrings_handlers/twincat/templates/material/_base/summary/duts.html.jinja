@@ -1,0 +1,54 @@
+{#- Template for dut summary
+
+
+Context:
+  context plcproj
+-#}
+
+
+{% if config.summary_section_style == "table" %}
+  {% block table_style scoped %}
+    {#- Block for the `table` section style. -#}
+    <p><span class="doc-section-title">User Datatypes</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dut in context.duts %}
+          <tr class="doc-section-item">
+            <td><code><autoref identifier="{{ dut.get_identifier() }}" optional hover>{{ dut.name }}</autoref></code></td>
+            <td>
+            {% if dut.documentation and dut.documentation.details %}
+              <div class="doc-md-description">
+                {{ dut.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+              </div>
+            {% endif %}  
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endblock table_style %}
+{% elif config.summary_section_style == "list" %}
+  {% block list_style scoped %}
+    {#- Block for the `list` section style. -#}
+    <p><span class="doc-section-title">User Datatypes</span></p>
+    <ul>
+      {% for dut in context.duts %}
+        <li class="doc-section-item field-body">
+          <b><code><autoref identifier="{{ dut.get_identifier() }}" optional hover>{{ dut.name }}</autoref></code></b>
+          {% if dut.documentation and dut.documentation.details %}
+          –
+          <div class="doc-md-description">
+            {{ dut.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+          </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endblock list_style %}
+{% endif %}

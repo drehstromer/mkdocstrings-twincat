@@ -1,0 +1,80 @@
+{#- Template for members (children) of an object.
+
+This template iterates on members of a given object and renders them.
+
+Context:
+  context plcproj, pou, itf: The object to render.
+  config (dict): The configuration options.
+  heading_level (int): The HTML heading level to use.
+-#}
+
+{% if context.pous or context.itfs or context.duts or context.methods or context.properties %}
+  <div class="doc doc-children">
+
+        {% if config.show_category_heading %}
+          {% set extra_level = 1 %}
+        {% else %}
+          {% set extra_level = 0 %}
+        {% endif %}
+
+      {% with %}
+          {% if context.itfs %}
+            {% if config.show_category_heading %}
+              {% filter heading(heading_level, id=html_id ~ "-interfaces") %}Interfaces{% endfilter %}
+            {% endif %}
+            {% with heading_level = heading_level + extra_level %}
+              {% for itf in context.itfs %}
+                  {% include "itf.html.jinja" with context %}
+              {% endfor %}
+            {% endwith %}
+          {% endif %}
+
+          {% if context.pous %}
+            {% if config.show_category_heading %}
+              {% filter heading(heading_level, id=html_id ~ "-functionblocks") %}Function Blocks{% endfilter %}
+            {% endif %}
+            {% with heading_level = heading_level + extra_level %}
+              {% for pou in context.pous %}
+                  {% include "pou.html.jinja" with context %}
+              {% endfor %}
+            {% endwith %}
+          {% endif %}
+
+          {% if context.duts %}
+            {% if config.show_category_heading %}
+              {% filter heading(heading_level, id=html_id ~ "-interfaces") %}Interfaces{% endfilter %}
+            {% endif %}
+            {% with heading_level = heading_level + extra_level %}
+              {% for dut in context.duts %}
+                  {% include "dut.html.jinja" with context %}
+              {% endfor %}
+            {% endwith %}
+          {% endif %}
+
+          {% if context.methods %}
+            {% if config.show_category_heading %}
+              {% filter heading(heading_level, id=html_id ~ "-methods") %}Methods{% endfilter %}
+            {% endif %}
+            {% with heading_level = heading_level + extra_level %}
+              {% for method in context.methods %}
+                  {% include "method.html.jinja" with context %}
+              {% endfor %}
+            {% endwith %}
+          {% endif %}
+
+
+          {% if context.properties %}
+            {% if config.show_category_heading %}
+              {% filter heading(heading_level, id=html_id ~ "-properties") %}Properties{% endfilter %}
+            {% endif %}
+            {% with heading_level = heading_level + extra_level %}
+              {% for property in context.properties %}
+                  {% include "property.html.jinja" with context %}
+              {% endfor %}
+            {% endwith %}
+          {% endif %}
+
+      {% endwith %}
+  </div>
+
+{% endif %}

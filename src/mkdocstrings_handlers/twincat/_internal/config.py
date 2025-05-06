@@ -89,6 +89,65 @@ if sys.version_info >= (3, 10):
     _dataclass_options["kw_only"] = True
 
 
+Order = Literal["alphabetical"]
+"""Ordering methods.
+
+- `__all__`: order members according to `__all__` module attributes, if declared;
+- `alphabetical`: order members alphabetically;
+- `source`: order members as they appear in the source file.
+"""
+
+# YORE: EOL 3.9: Replace `**_dataclass_options` with `frozen=True, kw_only=True` within line.
+@dataclass(**_dataclass_options)  # type: ignore[call-overload]
+class SummaryOption:
+    """Summary option."""
+
+    properties: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of properties.",
+        ),
+    ] = False
+
+    methods: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of methods.",
+        ),
+    ] = False
+
+    pous: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of pous.",
+        ),
+    ] = False
+
+    itfs: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of itfs.",
+        ),
+    ] = False
+
+    duts: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of duts.",
+        ),
+    ] = False
+
+
 # The input config class is useful to generate a JSON schema, see scripts/mkdocs_hooks.py.
 # YORE: EOL 3.9: Replace `**_dataclass_options` with `frozen=True, kw_only=True` within line.
 @dataclass(**_dataclass_options)
@@ -242,17 +301,51 @@ class TwincatInputOptions:
         ),
     ] = ""
 
+    summary: Annotated[
+        bool | SummaryOption,
+        _Field(
+            group="members",
+            description="Whether to render summaries of tcplc proj, pous, duts, itfs, methods.",
+        ),
+    ] = field(default_factory=SummaryOption)
+
+    show_category_heading: Annotated[
+        bool,
+        _Field(
+            group="headings",
+            description="When grouped by categories, show a heading for each category.",
+        ),
+    ] = False
+
+
     variable_section_style: Annotated[
-        Literal["table", "list", "spacy"],
+        Literal["table", "list"],
         _Field(
             group="variable",
             description="The style used to render variable sections.",
         ),
     ] = "table"
 
+    summary_section_style: Annotated[
+        Literal["table", "list"],
+        _Field(
+            group="variable",
+            description="The style used to render summarys.",
+        ),
+    ] = "table"
+
     @classmethod
     def coerce(cls, **data: Any) -> MutableMapping[str, Any]:
         """Coerce data."""
+        if "summary" in data:
+            summary = data["summary"]
+            if summary is True:
+                summary = SummaryOption(properties=True, methods=True, pous=True, itfs=True, duts=True)
+            elif summary is False:
+                summary = SummaryOption(properties=False, methods=False, pous=False, itfs=False, duts=False)
+            else:
+                summary = SummaryOption(**summary)
+            data["summary"] = summary
         return data
 
     @classmethod
@@ -267,6 +360,8 @@ class TwincatOptions(TwincatInputOptions):  # type: ignore[override,unused-ignor
     """Final options passed as template context."""
 
     # Re-declare any field to modify/narrow its type.
+    summary: SummaryOption = field(default_factory=SummaryOption)
+    """Whether to render summaries of modules, classes, functions (methods) and attributes."""
 
     @classmethod
     def coerce(cls, **data: Any) -> MutableMapping[str, Any]:

@@ -1,19 +1,19 @@
-{#- Template for TwinCAT DUTs (Data Unit Types).
+{#- Template for TwinCAT DUTs (dut Unit Types).
 
 This template renders a TwinCAT DUT (Struct, Enum, Union, etc.).
 
 Context:
-  data: The DUT object to render.
+  dut: The DUT object to render.
   root (bool): Whether this is the root object, injected with `:::` in a Markdown page.
   heading_level (int): The HTML heading level to use.
   config (dict): The configuration options.
 -#}
 
-{% block title %}{{ data.name }} - TwinCAT DUT Documentation{% endblock %}
+{% block title %}{{ dut.name }} - TwinCAT DUT Documentation{% endblock %}
 
 {% block content %}
 <div class="doc doc-object doc-dut">
-  {% with obj = data, html_id = data.get_identifier() %}
+  {% with obj = dut, html_id = dut.get_identifier() %}
 
     {% if root %}
       {% set show_full_path = config.show_root_full_path %}
@@ -25,7 +25,7 @@ Context:
       {% set show_full_path = config.show_object_full_path %}
     {% endif %}
 
-    {% set dut_name = data.get_identifier() if show_full_path else data.name %}
+    {% set dut_name = dut.get_identifier() if show_full_path else dut.name %}
 
     {% if not root or config.show_root_heading %}
       {% filter heading(
@@ -33,7 +33,7 @@ Context:
           role="dut",
           id=html_id,
           class="doc doc-heading",
-          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-dut"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-dut"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else dut.name),
         ) %}
 
         {% block heading scoped %}
@@ -59,7 +59,7 @@ Context:
         {% filter heading(heading_level,
             role="dut",
             id=html_id,
-            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-dut"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-dut"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else dut.name),
             hidden=True,
           ) %}
         {% endfilter %}
@@ -81,7 +81,7 @@ Context:
 
           This block renders the documentation for the DUT.
           -#}
-          {% include "tcdocumentation.html.jinja" %}
+          {% include "documentation.html.jinja" %}
         {% endblock docstring %}
 
         {% block declaration scoped %}
@@ -89,11 +89,11 @@ Context:
 
           This block renders the declaration for the DUT.
           -#}
-          {% if data.declaration %}
+          {% if dut.declaration %}
             <div class="doc doc-section">
               <h{{ heading_level + 1 }} class="doc doc-heading">Declaration</h{{ heading_level + 1 }}>
               <div class="doc doc-contents">
-                <pre><code class="language-twincat">{{ data.declaration }}</code></pre>
+                <pre><code class="language-twincat">{{ dut.declaration }}</code></pre>
               </div>
             </div>
           {% endif %}
@@ -104,7 +104,7 @@ Context:
 
           This block renders the variables for the DUT.
           -#}
-          {% include "tcvariable_section.html.jinja" %}
+          {% include "variable_section.html.jinja" %}
         {% endblock variables %}
       {% endblock contents %}
     </div>

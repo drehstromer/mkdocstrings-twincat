@@ -7,7 +7,7 @@ name = "mkdocstrings-twincat"
 description = "A Twincat handler for mkdocstrings."
 authors = [{name = "drehstromer", email = "privat@samuelruckli.ch"}]
 license = "MIT"
-version = "0.1.74"
+version = "0.1.110"
 license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -111,3 +111,6 @@ ci = [
 
 [tool.uv]
 default-groups = ["maintain", "ci", "docs"]
+
+[tool.uv.sources]
+pytwincatparser = { path = "../pytwincatparser" }

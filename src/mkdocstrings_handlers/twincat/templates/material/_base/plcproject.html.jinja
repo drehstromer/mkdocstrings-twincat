@@ -1,0 +1,90 @@
+{#- Template for Twincat Plc Projects.
+
+This template renders a twincat Plc Projects.
+context plcproject plcproj
+-#}
+
+
+<div class="doc doc-object doc-plcproject">
+  {% with obj = plcproject, html_id = plcproject.get_identifier() %}
+
+    {% if root %}
+      {% set show_full_path = config.show_root_full_path %}
+      {% set root_members = True %}
+    {% elif root_members %}
+      {% set show_full_path = config.show_root_members_full_path or config.show_object_full_path %}
+      {% set root_members = False %}
+    {% else %}
+      {% set show_full_path = config.show_object_full_path %}
+    {% endif %}
+
+    {% set plcproject_name = plcproject.get_identifier() if show_full_path else plcproject.name %}
+
+    {% if not root or config.show_root_heading %}
+      {% filter heading(
+          heading_level,
+          role="plcproject",
+          id=html_id,
+          class="doc doc-heading",
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-plcproject"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else plcproject.name),
+        ) %}
+
+        {% block heading scoped %}
+          {#- Heading block.
+
+          This block renders the heading for the module.
+          -#}
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-plcproject"></code>{% endif %}
+            <span class="doc doc-object-name doc-plcproject-name">{{ config.heading if config.heading and root else plcproject_name }}</span>
+        {% endblock heading %}
+
+      {% endfilter %}
+
+    {% else %}
+      {% if config.show_root_toc_entry %}
+        {% filter heading(heading_level,
+            role="plcproject",
+            id=html_id,
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-plcproject"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else plcproject.name),
+            hidden=True,
+          ) %}
+        {% endfilter %}
+      {% endif %}
+      {% set heading_level = heading_level - 1 %}
+    {% endif %}
+
+    <div class="doc doc-contents {% if root %}first{% endif %}">
+      {% block contents scoped %}
+        {#- Contents block.
+
+        This block renders the contents of the module.
+        It contains other blocks that users can override.
+        Overriding the contents block allows to rearrange the order of the blocks.
+        -#}
+
+        {% block summary scoped %}
+          {#- Summary block.
+
+        
+          -#}
+          {% with context=plcproject %}
+              {% include "summary.html.jinja" %}
+            {% endwith %}   
+        {% endblock summary %}
+
+        {% block children scoped %}
+          {#- Children block.
+
+          This block renders the children.
+          -#}
+          {% set root = False %}
+          {% set heading_level = heading_level + 1 %}
+            {% with context=plcproject %}
+                {% include "children.html.jinja" with context %}
+            {% endwith %} 
+        {% endblock children %}
+      {% endblock contents %}
+    </div>
+
+  {% endwith %}
+</div>

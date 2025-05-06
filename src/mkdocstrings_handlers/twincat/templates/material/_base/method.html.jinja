@@ -97,7 +97,7 @@ Context:
           This block renders the documentation for the method.
           -#}
             {% with documentation=method.documentation %}
-                {% include "tcdocumentation.html.jinja"%}
+                {% include "documentation.html.jinja"%}
             {% endwith %}     
         {% endblock docstring %}
 
@@ -107,7 +107,7 @@ Context:
           This block renders the variables for the POU.
           -#}
             {% with variable_sections=method.variable_sections %}
-                {% include "tcvariable_section.html.jinja"%}
+                {% include "variable_section.html.jinja"%}
             {% endwith %}   
         {% endblock variables %}
 

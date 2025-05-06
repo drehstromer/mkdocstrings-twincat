@@ -71,14 +71,18 @@
   --doc-symbol-function-fg-color: #8250df;
   --doc-symbol-method-fg-color: #8250df;
   --doc-symbol-pou-fg-color: #0550ae;
-  --doc-symbol-module-fg-color: #5cad0f;
+  --doc-symbol-plcproject-fg-color: #5cad0f;
+  --doc-symbol-dut-fg-color: #e9e641;
+  --doc-symbol-itf-fg-color: #e96341;
 
   --doc-symbol-variable-bg-color: #df50af1a;
   --doc-symbol-property-bg-color: #9538001a;
   --doc-symbol-function-bg-color: #8250df1a;
   --doc-symbol-method-bg-color: #8250df1a;
   --doc-symbol-pou-bg-color: #0550ae1a;
-  --doc-symbol-module-bg-color: #5cad0f1a;
+  --doc-symbol-plcproject-bg-color: #5cad0f1a;
+  --doc-symbol-dut-bg-color: #e9e6411a;
+  --doc-symbol-itf-bg-color: #e963411c;
 }
 
 [data-md-color-scheme="slate"] {
@@ -87,14 +91,18 @@
   --doc-symbol-function-fg-color: #d2a8ff;
   --doc-symbol-method-fg-color: #d2a8ff;
   --doc-symbol-pou-fg-color: #79c0ff;
-  --doc-symbol-module-fg-color: #baff79;
+  --doc-symbol-plcproject-fg-color: #baff79;
+  --doc-symbol-dut-fg-color: #eeec79;
+  --doc-symbol-itf-fg-color: #f0795b;
 
   --doc-symbol-variable-bg-color: #ffa8cc1a;
   --doc-symbol-property-bg-color: #ffa6571a;
   --doc-symbol-function-bg-color: #d2a8ff1a;
   --doc-symbol-method-bg-color: #d2a8ff1a;
   --doc-symbol-pou-bg-color: #79c0ff1a;
-  --doc-symbol-module-bg-color: #baff791a;
+  --doc-symbol-plcproject-bg-color: #baff791a;
+  --doc-symbol-dut-bg-color: #eeec791f;
+  --doc-symbol-itf-bg-color: #e08a742a;
 }
 
 
@@ -114,6 +122,27 @@ a code.doc-symbol-variable {
 code.doc-symbol-variable::after {
   content: "var";
 }
+
+code.doc-symbol-dut,
+a code.doc-symbol-dut {
+  color: var(--doc-symbol-dut-fg-color);
+  background-color: var(--doc-symbol-dut-bg-color);
+}
+
+code.doc-symbol-dut::after {
+  content: "dut";
+}
+
+code.doc-symbol-itf,
+a code.doc-symbol-itf {
+  color: var(--doc-symbol-itf-fg-color);
+  background-color: var(--doc-symbol-itf-bg-color);
+}
+
+code.doc-symbol-itf::after {
+  content: "itf";
+}
+
 
 code.doc-symbol-property,
 a code.doc-symbol-property {
@@ -155,14 +184,14 @@ code.doc-symbol-pou::after {
   content: "pou";
 }
 
-code.doc-symbol-module,
-a code.doc-symbol-module {
-  color: var(--doc-symbol-module-fg-color);
-  background-color: var(--doc-symbol-module-bg-color);
+code.doc-symbol-plcproject,
+a code.doc-symbol-plcproject {
+  color: var(--doc-symbol-plcproject-fg-color);
+  background-color: var(--doc-symbol-plcproject-bg-color);
 }
 
-code.doc-symbol-module::after {
-  content: "mod";
+code.doc-symbol-plcproject::after {
+  content: "plcproject";
 }
 
 

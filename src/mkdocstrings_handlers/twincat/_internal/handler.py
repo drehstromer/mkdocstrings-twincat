@@ -10,7 +10,7 @@ from contextlib import suppress
 from pathlib import Path, PureWindowsPath
 from typing import TYPE_CHECKING, Any, ClassVar, List
 
-from pytwincatparser import Loader,get_strategy, TcObjects, BaseStrategy, get_default_strategy
+from pytwincatparser import Loader,get_strategy, Objects, BaseStrategy, get_default_strategy
 
 from mkdocs.exceptions import PluginError
 from mkdocstrings import BaseHandler, CollectionError, CollectorItem, get_logger
@@ -76,7 +76,7 @@ class TwincatHandler(BaseHandler):
         self.global_options = config.options
         """The global configuration options."""
 
-        self._collected: dict[str, TcObjects] = {}
+        self._collected: dict[str, Objects] = {}
         self._strategy: BaseStrategy = None
         if config.default_strategy is not None:
             strategy = get_strategy(config.default_strategy)
@@ -170,12 +170,13 @@ class TwincatHandler(BaseHandler):
         template_name = rendering.do_get_template(self.env, data)
         template = self.env.get_template(template_name)
 
-        # All the following variables will be available in the Jinja templates.
         return template.render(
-            config=options,
-            data=data,  # You might want to rename `data` into something more specific.
-            heading_level=options.heading_level,
-            root=True,
+            **{
+                "config": options,
+                data.kind: data, # depending on the class type of the data, the variable inside the jinja template will be named differently
+                "heading_level": options.heading_level,
+                "root": True,
+            },
         )
 
     def get_aliases(self, identifier: str) -> tuple[str, ...]:

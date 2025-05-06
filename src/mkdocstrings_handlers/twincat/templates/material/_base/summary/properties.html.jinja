@@ -1,0 +1,54 @@
+{#- Template for properties summary
+
+
+Context:
+  context pou, itf
+-#}
+
+
+{% if config.summary_section_style == "table" %}
+  {% block table_style scoped %}
+    {#- Block for the `table` section style. -#}
+    <p><span class="doc-section-title">Properties</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prop in context.properties %}
+          <tr class="doc-section-item">
+            <td><code><autoref identifier="{{ prop.get_identifier() }}" optional hover>{{ prop.name }}</autoref></code></td>
+            <td>
+            {% if prop.documentation and prop.documentation.details %}
+              <div class="doc-md-description">
+                {{ prop.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endblock table_style %}
+{% elif config.summary_section_style == "list" %}
+  {% block list_style scoped %}
+    {#- Block for the `list` section style. -#}
+    <p><span class="doc-section-title">Properties</span></p>
+    <ul>
+      {% for prop in context.properties %}
+        <li class="doc-section-item field-body">
+          <b><code><autoref identifier="{{ prop.get_identifier() }}" optional hover>{{ prop.name }}</autoref></code></b>
+          {% if prop.documentation and prop.documentation.details %}
+          –
+          <div class="doc-md-description">
+            {{ prop.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+          </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endblock list_style %}
+{% endif %}

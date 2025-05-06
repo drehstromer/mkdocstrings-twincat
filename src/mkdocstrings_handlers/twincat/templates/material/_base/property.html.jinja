@@ -3,7 +3,7 @@
 This template renders a TwinCAT property.
 
 Context:
-  method: The method object to render.
+  property: The property object to render.
   heading_level (int): The HTML heading level to use.
   config (dict): The configuration options.
 -#}
@@ -87,7 +87,7 @@ Context:
           This block renders the documentation for the method.
           -#}
             {% with documentation=property.documentation %}
-                {% include "tcdocumentation.html.jinja"%}
+                {% include "documentation.html.jinja"%}
             {% endwith %}     
         {% endblock docstring %}
 

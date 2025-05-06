@@ -3,7 +3,7 @@
 This template renders a TwinCAT POU (Function Block, Program, or Function).
 
 Context:
-  data: The POU object to render.
+  pou: The POU object to render.
   root (bool): Whether this is the root object, injected with `:::` in a Markdown page.
   heading_level (int): The HTML heading level to use.
   config (dict): The configuration options.
@@ -11,7 +11,7 @@ Context:
 
 
 <div class="doc doc-object doc-pou">
-  {% with obj = data, html_id = data.get_identifier() %}
+  {% with obj = pou, html_id = pou.get_identifier() %}
 
     {% if root %}
       {% set show_full_path = config.show_root_full_path %}
@@ -23,7 +23,7 @@ Context:
       {% set show_full_path = config.show_object_full_path %}
     {% endif %}
 
-    {% set pou_name = data.get_identifier() if show_full_path else data.name %}
+    {% set pou_name = pou.get_identifier() if show_full_path else pou.name %}
 
     {% if not root or config.show_root_heading %}
       {% filter heading(
@@ -31,7 +31,7 @@ Context:
           role="pou",
           id=html_id,
           class="doc doc-heading",
-          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-pou"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-pou"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else pou.name),
         ) %}
 
         {% block heading scoped %}
@@ -49,7 +49,7 @@ Context:
         {% filter heading(heading_level,
             role="pou",
             id=html_id,
-            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-pou"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else data.name),
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-pou"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else pou.name),
             hidden=True,
           ) %}
         {% endfilter %}
@@ -71,16 +71,16 @@ Context:
 
           This block renders the inheritance information for the POU.
           -#}
-          {% if data.extends and config.show_extends %}
+          {% if pou.extends and config.show_extends %}
             <p class="doc doc-pou-extends">
-              Extends: <code>{{ data.extends }}</code>
+              Extends: <code>{{ pou.extends }}</code>
             </p>
           {% endif %}
           
-          {% if data.implements and config.show_implements %}
+          {% if pou.implements and config.show_implements %}
             <p class="doc doc-pou-implements">
               Implements: 
-              {% for interface in data.implements -%}
+              {% for interface in pou.implements -%}
                 <code>{{ interface }}</code>{% if not loop.last %}, {% endif %}
               {% endfor %}
             </p>
@@ -93,12 +93,20 @@ Context:
           This block renders the documentation for the POU.
           -#}
 
-            {% with documentation=data.documentation %}
-                {% include "tcdocumentation.html.jinja"%}
+            {% with documentation=pou.documentation %}
+                {% include "documentation.html.jinja"%}
             {% endwith %}          
         {% endblock docstring %}
 
+        {% block summary scoped %}
+          {#- Summary block.
 
+        
+          -#}
+            {% with context=pou %}
+              {% include "summary.html.jinja" %}
+            {% endwith %}   
+        {% endblock summary %}
 
 
 
@@ -107,8 +115,8 @@ Context:
 
           This block renders the variables for the POU.
           -#}
-            {% with variable_sections=data.variable_sections %}
-                {% include "tcvariable_section.html.jinja"%}
+            {% with variable_sections=pou.variable_sections %}
+                {% include "variable_section.html.jinja"%}
             {% endwith %}   
           
         {% endblock variables %}
@@ -120,10 +128,10 @@ Context:
           This block renders the declaration for the POU.
           -#}
 
-          {% if data.declaration and config.show_source %}
+          {% if pou.declaration and config.show_source %}
             <details class="quote">
               <summary>"Declaration" </summary>
-              {{ data.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
+              {{ pou.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>
           {% endif %}
         {% endblock declaration %}
@@ -134,39 +142,26 @@ Context:
           This block renders the implementation for the POU.
           -#}
 
-          {% if data.implementation and config.show_source %}
+          {% if pou.implementation and config.show_source %}
             <details class="quote">
               <summary>"Implementation" </summary>
-              {{ data.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
+              {{ pou.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>
           {% endif %}
         {% endblock implementation %}
 
-        {% set heading_level = heading_level + 1 %}
+        {% block children scoped %}
+          {#- Children block.
 
-        {% block methods scoped %}
-          {#- Methods block.
-
-          This block renders the methods for the POU.
+          This block renders the children.
           -#}
-          {% if data.methods %}
-                {% for method in data.methods %}
-                  {% include "tcmethod.html.jinja" %}
-                {% endfor %}
-          {% endif %}
-        {% endblock methods %}
+          {% set root = False %}
+          {% set heading_level = heading_level + 1 %}
+            {% with context=pou %}
+                {% include "children.html.jinja" with context %}
+            {% endwith %} 
+        {% endblock children %}
 
-        {% block properties scoped %}
-          {#- Properties block.
-
-          This block renders the properties for the POU.
-          -#}
-          {% if data.properties %}
-            {% for property in data.properties %}
-                {% include "tcproperty.html.jinja" %}
-            {% endfor %}
-          {% endif %}
-        {% endblock properties %}
       {% endblock contents %}
     </div>
 

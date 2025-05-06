@@ -1,0 +1,155 @@
+{#- Template for TwinCAT itfs 
+
+This template renders a TwinCAT itf 
+
+Context:
+  itf: The itf object to render.
+  root (bool): Whether this is the root object, injected with `:::` in a Markdown page.
+  heading_level (int): The HTML heading level to use.
+  config (dict): The configuration options.
+-#}
+
+
+<div class="doc doc-object doc-itf">
+  {% with obj = itf, html_id = itf.get_identifier() %}
+
+    {% if root %}
+      {% set show_full_path = config.show_root_full_path %}
+      {% set root_members = True %}
+    {% elif root_members %}
+      {% set show_full_path = config.show_root_members_full_path or config.show_object_full_path %}
+      {% set root_members = False %}
+    {% else %}
+      {% set show_full_path = config.show_object_full_path %}
+    {% endif %}
+
+    {% set itf_name = itf.get_identifier() if show_full_path else itf.name %}
+
+    {% if not root or config.show_root_heading %}
+      {% filter heading(
+          heading_level,
+          role="itf",
+          id=html_id,
+          class="doc doc-heading",
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-itf"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else itf.name),
+        ) %}
+
+        {% block heading scoped %}
+          {#- Heading block.
+
+          This block renders the heading for the itf.
+          -#}
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-itf"></code>{% endif %}
+          <span class="doc doc-object-name doc-itf-name">{{ config.heading if config.heading and root else itf_name }}</span>
+        {% endblock heading %}
+
+      {% endfilter %}
+    {% else %}
+      {% if config.show_root_toc_entry %}
+        {% filter heading(heading_level,
+            role="itf",
+            id=html_id,
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-itf"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else itf.name),
+            hidden=True,
+          ) %}
+        {% endfilter %}
+      {% endif %}
+      {% set heading_level = heading_level - 1 %}
+    {% endif %}
+
+    <div class="doc doc-contents {% if root %}first{% endif %}">
+      {% block contents scoped %}
+        {#- Contents block.
+
+        This block renders the contents of the itf.
+        It contains other blocks that users can override.
+        Overriding the contents block allows to rearrange the order of the blocks.
+        -#}
+        
+        {% block inheritance scoped %}
+          {#- Inheritance block.
+
+          This block renders the inheritance information for the itf.
+          -#}
+          {% if itf.extends and config.show_extends %}
+            <p class="doc doc-itf-extends">
+              Extends:
+              {% for extend in itf.extends -%}
+                <code>{{ extend }}</code>{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+        {% endblock inheritance %}
+
+        {% block docstring scoped %}
+          {#- Docstring block.
+
+          This block renders the documentation for the itf.
+          -#}
+
+            {% with documentation=itf.documentation %}
+                {% include "documentation.html.jinja"%}
+            {% endwith %}          
+        {% endblock docstring %}
+
+        {% block summary scoped %}
+          {#- Summary block.
+
+        
+          -#}
+            {% with context=itf %}
+              {% include "summary.html.jinja" %}
+            {% endwith %}   
+        {% endblock summary %}
+
+
+
+
+
+
+        {% block declaration scoped %}
+          {#- declaration block.
+
+          This block renders the declaration for the itf.
+          -#}
+
+          {% if itf.declaration and config.show_source %}
+            <details class="quote">
+              <summary>"Declaration" </summary>
+              {{ itf.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
+            </details>
+          {% endif %}
+        {% endblock declaration %}
+
+        {% block implementation scoped %}
+          {#- Implementation block.
+
+          This block renders the implementation for the itf.
+          -#}
+
+          {% if itf.implementation and config.show_source %}
+            <details class="quote">
+              <summary>"Implementation" </summary>
+              {{ itf.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
+            </details>
+          {% endif %}
+        {% endblock implementation %}
+
+        {% block children scoped %}
+          {#- Children block.
+
+          This block renders the children.
+          -#}
+          {% set root = False %}
+          {% set heading_level = heading_level + 1 %}
+            {% with context=itf %}
+                {% include "children.html.jinja" with context %}
+            {% endwith %} 
+        {% endblock children %}
+
+      {% endblock contents %}
+    </div>
+
+  {% endwith %}
+</div>
+
