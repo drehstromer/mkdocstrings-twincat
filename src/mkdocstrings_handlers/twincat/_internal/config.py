@@ -303,6 +303,14 @@ class TwincatInputOptions:
         ),
     ] = True
 
+    show_labels: Annotated[
+        bool,
+        _Field(
+            group="docu",
+            description="Whether to show labels of the members.",
+        ),
+    ] = True
+
     variable_headings: Annotated[
         bool,
         _Field(

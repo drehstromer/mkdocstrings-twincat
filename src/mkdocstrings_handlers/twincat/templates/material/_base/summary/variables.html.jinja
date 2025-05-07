@@ -5,15 +5,15 @@ Context:
   context pou, dut, method
 -#}
 
-{% set var_inputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
-{% set var_inouts = context.variables|selectattr("section_type", "equalto", "var_in_out") %}
-{% set var_outputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
+{% set var_inputs = context.variables|selectattr("section_type", "equalto", "var_input")|list %}
+{% set var_inouts = context.variables|selectattr("section_type", "equalto", "var_in_out")|list %}
+{% set var_outputs = context.variables|selectattr("section_type", "equalto", "var_output")|list %}
 
 
 
   {% if config.summary_section_style == "table" %}
     {% block table_style scoped %}
-    {% if var_inputs %}
+    {% if var_inputs%}
       {#- Block for the `table` section style. -#}
       <p><span class="doc-section-title">Inputs</span></p>
       <table>
@@ -39,7 +39,7 @@ Context:
         </tbody>
       </table>
     {% endif %}
-    {% if var_outputs %}
+    {% if var_outputs%}
       {#- Block for the `table` section style. -#}
       <p><span class="doc-section-title">Outputs</span></p>
       <table>
@@ -65,7 +65,7 @@ Context:
         </tbody>
       </table>
     {% endif %}
-    {% if var_inouts %}
+    {% if var_inouts%}
       {#- Block for the `table` section style. -#}
       <p><span class="doc-section-title">In/Outputs</span></p>
       <table>
@@ -96,7 +96,7 @@ Context:
 
   {% elif config.summary_section_style == "list" %}
     {% block list_style scoped %}
-    {% if var_inputs %}
+    {% if var_inputs%}
       {#- Block for the `list` section style. -#}
       <p><span class="doc-section-title">Inputs</span></p>
       <ul>
@@ -114,7 +114,7 @@ Context:
       </ul>
     {% endif %}
 
-    {% if var_outputs %}
+    {% if var_outputs%}
       {#- Block for the `list` section style. -#}
       <p><span class="doc-section-title">Outputs</span></p>
       <ul>
@@ -132,7 +132,7 @@ Context:
       </ul>
   {% endif %}
 
-  {% if var_inouts %}
+  {% if var_inouts%}
       {#- Block for the `list` section style. -#}
       <p><span class="doc-section-title">In/Outputs</span></p>
       <ul>

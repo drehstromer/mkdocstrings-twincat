@@ -43,7 +43,15 @@ Context:
           {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-{{ symbol_type }}"></code>{% endif %}
             <span class="doc doc-object-name doc-variable-name">{{ config.heading if config.heading and root else variable_name }}</span>
         {% endblock heading %}
+        {% block labels scoped %}
+          {#- Labels block.
 
+          This block renders the labels for the class.
+          -#}
+          {% with labels = variable.labels %}
+            {% include "labels.html.jinja" %}
+          {% endwith %}
+        {% endblock labels %}
         {% endfilter %}
 
 

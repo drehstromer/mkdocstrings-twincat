@@ -42,7 +42,15 @@ Context:
           {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-itf"></code>{% endif %}
           <span class="doc doc-object-name doc-itf-name">{{ config.heading if config.heading and root else itf_name }}</span>
         {% endblock heading %}
+        {% block labels scoped %}
+          {#- Labels block.
 
+          This block renders the labels for the class.
+          -#}
+          {% with labels = itf.labels %}
+            {% include "labels.html.jinja" %}
+          {% endwith %}
+        {% endblock labels %}
       {% endfilter %}
     {% else %}
       {% if config.show_root_toc_entry %}
@@ -66,20 +74,6 @@ Context:
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
         
-        {% block inheritance scoped %}
-          {#- Inheritance block.
-
-          This block renders the inheritance information for the itf.
-          -#}
-          {% if itf.extends and config.show_extends %}
-            <p class="doc doc-itf-extends">
-              Extends:
-              {% for extend in itf.extends -%}
-                <code>{{ extend }}</code>{% if not loop.last %}, {% endif %}
-              {% endfor %}
-            </p>
-          {% endif %}
-        {% endblock inheritance %}
 
         {% block docstring scoped %}
           {#- Docstring block.
@@ -115,7 +109,7 @@ Context:
 
           {% if (itf.declaration or itf.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Source Code" </summary>
+              <summary>Source Code</summary>
               {{ itf.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
               {{ itf.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>

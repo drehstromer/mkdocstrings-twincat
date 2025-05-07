@@ -87,11 +87,11 @@ Context:
 
 
           {% if context.variables %}
-            {% set var_inputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
-            {% set var_inouts = context.variables|selectattr("section_type", "equalto", "var_in_out") %}
-            {% set var_outputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
+            {% set var_inputs = context.variables|selectattr("section_type", "equalto", "var_input")|list %}
+            {% set var_inouts = context.variables|selectattr("section_type", "equalto", "var_in_out")|list %}
+            {% set var_outputs = context.variables|selectattr("section_type", "equalto", "var_output")|list %}
 
-            {% if var_inputs %}
+            {% if var_inputs%}
               {% if config.show_category_heading %}
                 {% filter heading(heading_level, id=html_id ~ "-varinputs") %}Inputs{% endfilter %}
               {% endif %}
@@ -102,7 +102,7 @@ Context:
               {% endwith %}
             {% endif %}
 
-            {% if var_inouts %}
+            {% if var_inouts%}
               {% if config.show_category_heading %}
                 {% filter heading(heading_level, id=html_id ~ "-varinputs") %}In/Outputs{% endfilter %}
               {% endif %}
@@ -113,7 +113,7 @@ Context:
               {% endwith %}
             {% endif %}
 
-            {% if var_outputs %}
+            {% if var_outputs%}
               {% if config.show_category_heading %}
                 {% filter heading(heading_level, id=html_id ~ "-varinputs") %}Outputs{% endfilter %}
               {% endif %}

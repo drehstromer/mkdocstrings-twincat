@@ -8,79 +8,24 @@ Context:
   config (dict): The configuration options.
 -#}
 
-{% if documentation %}
-<div class="doc doc-section doc-section-title">
-  <h{{ heading_level + 1 }} class="doc doc-heading">Documentation</h{{ heading_level + 1 }}>
-  <div class="doc doc-contents">
-    {% block documentation_content scoped %}
-      {#- Documentation content block.
+{% if documentation.details%}
+    {{ documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+{% endif %}
 
-      This block renders the content of the documentation.
-      -#}
-      
-      {% block details scoped %}
-        {#- Brief block.
+{% if documentation.usage%}
+<p><span class="doc-section-title">Usage</span></p>
+    {{ documentation.usage|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+{% endif %}
 
-        This block renders the details description.
-        -#}
-        {% if documentation.details %}
-          <div class="doc doc-tag doc-tag-details">
-            <p class="doc doc-tag-name"><strong>Details:</strong></p>
-            <div class="doc doc-tag-value">
-              {{ documentation.details|convert_markdown(heading_level + 2) }}
-            </div>
-          </div>
-        {% endif %}
-      {% endblock details %}
-      
-      {% block usage scoped %}
-        {#- Details block.
+{% if documentation.return%}
+<p><span class="doc-section-title">Details</span></p>
+    {{ documentation.return|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+{% endif %}
 
-        This block renders the usage description.
-        -#}
-        {% if documentation.usage %}
-          <div class="doc doc-tag doc-tag-usage">
-            <p class="doc doc-tag-name"><strong>Usage:</strong></p>
-            <div class="doc doc-tag-value">
-              {{ documentation.usage|highlight(language=pascal) }}
-            </div>
-          </div>
-        {% endif %}
-      {% endblock usage %}
-      
-      {% block Return scoped %}
-        {#- Return block.
 
-        This block renders the Return information.
-        -#}
-        {% if documentation.returns %}
-          <div class="doc doc-tag doc-tag-returns">
-            <p class="doc doc-tag-name"><strong>Returns:</strong></p>
-            <div class="doc doc-tag-value">
-              {{ documentation.returns|convert_markdown(heading_level + 2) }}
-            </div>
-          </div>
-        {% endif %}
-      {% endblock Return %}
-      
-      
-      {% block custom_tags scoped %}
-        {#- Custom tags block.
-
-        This block renders any custom documentation tags.
-        -#}
-        {% if documentation.custom_tags %}
-          {% for tag_name, tag_value in documentation.custom_tags.items() %}
-            <div class="doc doc-tag doc-tag-custom">
-              <p class="doc doc-tag-name"><strong>{{ tag_name }}:</strong></p>
-              <div class="doc doc-tag-value">
-                {{ tag_value|convert_markdown(heading_level + 2)}}
-              </div>
-            </div>
-          {% endfor %}
-        {% endif %}
-      {% endblock custom_tags %}
-    {% endblock documentation_content %}
-  </div>
-</div>
+{% if documentation.custom_tags%}
+  {% for tag_name, tag_value in documentation.custom_tags.items() %}
+  <p><span class="doc-section-title">{{tag_name}}</span></p>
+      {{ tag_value|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+  {% endfor %}
 {% endif %}

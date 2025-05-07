@@ -43,6 +43,16 @@ Context:
             <span class="doc doc-object-name doc-method-name">{{ config.heading if config.heading and root else method_name }}</span>
         {% endblock heading %}
 
+        {% block labels scoped %}
+          {#- Labels block.
+
+          This block renders the labels for the class.
+          -#}
+          {% with labels = method.labels %}
+            {% include "labels.html.jinja" %}
+          {% endwith %}
+        {% endblock labels %}
+
         {% endfilter %}
 
 
@@ -71,25 +81,7 @@ Context:
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
         
-        {% block accessModifier scoped %}
-          {#- Inheritance block.
 
-          This block renders the accessModifier.
-          -#}
-          {% if method.accessModifier and config.show_access_modifier %}
-            <p class="doc doc-method-accessModifier">
-              Access Modifier: <code>{{ method.accessModifier }}</code>
-            </p>
-          {% endif %}
-        {% endblock accessModifier %}
-          
-        {% block Return scoped %}
-          {% if method.returnType and config.show_return %}
-            <p class="doc doc-method-return">
-                Return: <code>{{ method.returnType }}</code>
-            </p>
-          {% endif %}
-        {% endblock Return %}
 
         {% block docstring scoped %}
           {#- Docstring block.
@@ -120,7 +112,7 @@ Context:
 
           {% if (method.declaration or method.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Source Code" </summary>
+              <summary>Source Code</summary>
               {{ method.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
               {{ method.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>

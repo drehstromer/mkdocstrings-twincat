@@ -44,6 +44,16 @@ Context:
             <span class="doc doc-object-name doc-property-name">{{ config.heading if config.heading and root else property_name }}</span>
         {% endblock heading %}
 
+        {% block labels scoped %}
+          {#- Labels block.
+
+          This block renders the labels for the class.
+          -#}
+          {% with labels = property.labels %}
+            {% include "labels.html.jinja" %}
+          {% endwith %}
+        {% endblock labels %}
+
         {% endfilter %}
 
 
@@ -72,14 +82,6 @@ Context:
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
         
-          
-        {% block Return scoped %}
-          {% if property.returnType and config.show_return %}
-            <p class="doc doc-property-return">
-                Return: <code>{{ property.returnType }}</code>
-            </p>
-          {% endif %}
-        {% endblock Return %}
 
         {% block docstring scoped %}
           {#- Docstring block.
@@ -100,7 +102,7 @@ Context:
 
           {% if (property.get and property.get.implementation) or (property.set and property.set.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Source Code" </summary>
+              <summary>Source Code</summary>
               {% if (property.get and property.get.implementation)%}
               {{ property.get.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
                {% endif %}

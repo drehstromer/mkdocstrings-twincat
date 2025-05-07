@@ -42,7 +42,15 @@ Context:
           {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-pou"></code>{% endif %}
           <span class="doc doc-object-name doc-pou-name">{{ config.heading if config.heading and root else pou_name }}</span>
         {% endblock heading %}
+        {% block labels scoped %}
+          {#- Labels block.
 
+          This block renders the labels for the class.
+          -#}
+          {% with labels = pou.labels %}
+            {% include "labels.html.jinja" %}
+          {% endwith %}
+        {% endblock labels %}
       {% endfilter %}
     {% else %}
       {% if config.show_root_toc_entry %}
@@ -65,27 +73,6 @@ Context:
         It contains other blocks that users can override.
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
-        
-        {% block inheritance scoped %}
-          {#- Inheritance block.
-
-          This block renders the inheritance information for the POU.
-          -#}
-          {% if pou.extends and config.show_extends %}
-            <p class="doc doc-pou-extends">
-              Extends: <code>{{ pou.extends }}</code>
-            </p>
-          {% endif %}
-          
-          {% if pou.implements and config.show_implements %}
-            <p class="doc doc-pou-implements">
-              Implements: 
-              {% for interface in pou.implements -%}
-                <code>{{ interface }}</code>{% if not loop.last %}, {% endif %}
-              {% endfor %}
-            </p>
-          {% endif %}
-        {% endblock inheritance %}
 
         {% block docstring scoped %}
           {#- Docstring block.
@@ -117,7 +104,7 @@ Context:
 
           {% if (pou.declaration or pou.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Source Code" </summary>
+              <summary>Source Code</summary>
               {{ pou.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
               {{ pou.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>

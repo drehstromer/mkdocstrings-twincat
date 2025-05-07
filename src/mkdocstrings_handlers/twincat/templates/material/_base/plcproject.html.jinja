@@ -23,7 +23,7 @@ context plcproject plcproj
     {% if not root or config.show_root_heading %}
       {% filter heading(
           heading_level,
-          role="plcproject",
+          role="plc",
           id=html_id,
           class="doc doc-heading",
           toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-plcproject"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else plcproject.name),
@@ -37,6 +37,16 @@ context plcproject plcproj
           {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-plcproject"></code>{% endif %}
             <span class="doc doc-object-name doc-plcproject-name">{{ config.heading if config.heading and root else plcproject_name }}</span>
         {% endblock heading %}
+
+        {% block labels scoped %}
+          {#- Labels block.
+
+          This block renders the labels for the class.
+          -#}
+          {% with labels = plcproject.labels %}
+            {% include "labels.html.jinja" %}
+          {% endwith %}
+        {% endblock labels %}
 
       {% endfilter %}
 
@@ -62,6 +72,17 @@ context plcproject plcproj
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
 
+        {% block docstring scoped %}
+          {#- Docstring block.
+
+          This block renders the documentation for the method.
+          -#}
+            {% with documentation=plcproject.documentation %}
+                {% include "documentation.html.jinja"%}
+            {% endwith %}     
+        {% endblock docstring %}
+
+
         {% block summary scoped %}
           {#- Summary block.
 
@@ -71,6 +92,24 @@ context plcproject plcproj
               {% include "summary.html.jinja" %}
             {% endwith %}   
         {% endblock summary %}
+
+        {% if plcproject.dependencies%}
+          <p><span class="doc-section-title">Dependencies</span></p>
+          <ul>
+            {% for dep in plcproject.dependencies %}
+              <li class="doc-section-item field-body">
+                <b><code><autoref identifier="{{ dep.name }}" optional hover>{{ dep.name }}</autoref></code></b>
+                {% if dep.version or dep.category %}
+                –
+                <div class="doc-md-description">
+                  {% if dep.version %}{{ dep.version }} – {% endif%}{% if dep.category %}{{ dep.category }}{% endif%}
+                </div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
 
         {% block children scoped %}
           {#- Children block.

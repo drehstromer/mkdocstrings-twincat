@@ -205,7 +205,7 @@ a code.doc-symbol-plcproject {
 }
 
 code.doc-symbol-plcproject::after {
-  content: "plcproject";
+  content: "plc";
 }
 
 
