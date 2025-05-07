@@ -92,34 +92,25 @@ Context:
         {% endblock docstring %}
 
 
-        {% block set_implementation scoped %}
+        {% block sourcecode scoped %}
           {#- Implementation block.
 
           This block renders the implementation for the POU.
           -#}
 
-          {% if property.get and property.get.implementation and config.show_source %}
+          {% if (property.get and property.get.implementation) or (property.set and property.set.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Get Implementation" </summary>
+              <summary>"Source Code" </summary>
+              {% if (property.get and property.get.implementation)%}
               {{ property.get.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
-            </details>
-          {% endif %}
-        {% endblock set_implementation %}
-
-
-        {% block get_implementation scoped %}
-          {#- Implementation block.
-
-          This block renders the implementation for the POU.
-          -#}
-
-          {% if property.set and property.set.implementation and config.show_source %}
-            <details class="quote">
-              <summary>"Set Implementation" </summary>
+               {% endif %}
+               {% if (property.set and property.set.implementation)%}
               {{ property.set.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
+               {% endif %}
             </details>
           {% endif %}
-        {% endblock get_implementation %}
+        {% endblock sourcecode %}
+
 
       {% endblock contents %}
     </div>

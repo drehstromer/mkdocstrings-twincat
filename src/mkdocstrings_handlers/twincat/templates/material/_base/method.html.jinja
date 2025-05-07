@@ -101,44 +101,48 @@ Context:
             {% endwith %}     
         {% endblock docstring %}
 
-        {% block variables scoped %}
-          {#- Variables block.
+        {% block summary scoped %}
+          {#- Summary block.
 
-          This block renders the variables for the POU.
+        
           -#}
-            {% with variable_sections=method.variable_sections %}
-                {% include "variable_section.html.jinja"%}
+            {% with context=method %}
+              {% include "summary.html.jinja" %}
             {% endwith %}   
-        {% endblock variables %}
+        {% endblock summary %}
 
 
-        {% block declaration scoped %}
+        {% block sourcecode scoped %}
           {#- declaration block.
 
           This block renders the declaration for the POU.
           -#}
 
-          {% if method.declaration and config.show_source %}
+          {% if (method.declaration or method.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Declaration" </summary>
+              <summary>"Source Code" </summary>
               {{ method.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
-            </details>
-          {% endif %}
-        {% endblock declaration %}
-
-        {% block implementation scoped %}
-          {#- Implementation block.
-
-          This block renders the implementation for the POU.
-          -#}
-
-          {% if method.implementation and config.show_source %}
-            <details class="quote">
-              <summary>"Implementation" </summary>
               {{ method.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>
           {% endif %}
-        {% endblock implementation %}
+        {% endblock sourcecode %}
+
+
+
+        {% block children scoped %}
+          {#- Children block.
+
+          This block renders the children.
+          -#}
+          {% set root = False %}
+          {% set heading_level = heading_level + 1 %}
+            {% with context=method %}
+                {% include "children.html.jinja" with context %}
+            {% endwith %} 
+        {% endblock children %}
+
+
+
 
       {% endblock contents %}
     </div>

@@ -4,12 +4,7 @@
 context: context = Pou, itf, plcproj
  -#}
 
-{% block logs scoped %}
-  {#- Logging block.
 
-  This block can be used to log debug messages, deprecation messages, warnings, etc.
-  -#}
-{% endblock logs %}
 
 
 {% if config.summary.itfs and context.itfs %}
@@ -22,17 +17,25 @@ context: context = Pou, itf, plcproj
 {% endif %}
 
 
-{% if config.summary.duts  and context.duts %}
+{% if config.summary.duts and context.duts %}
   {% include "summary/duts.html.jinja" %}
 {% endif %}
 
 
-{% if config.summary.methods  and context.methods %}
+{% if config.summary.gvls and context.gvls %}
+  {% include "summary/gvls.html.jinja" %}
+{% endif %}
+
+
+{% if config.summary.methods and context.methods %}
   {% include "summary/methods.html.jinja" %}
 {% endif %}
 
 
-{% if config.summary.properties  and context.properties %}
+{% if config.summary.properties and context.properties %}
   {% include "summary/properties.html.jinja" %}
 {% endif %}
 
+{% if config.summary.variables and context.variables %}
+  {% include "summary/variables.html.jinja" %}
+{% endif %}

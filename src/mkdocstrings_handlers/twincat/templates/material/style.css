@@ -74,6 +74,7 @@
   --doc-symbol-plcproject-fg-color: #5cad0f;
   --doc-symbol-dut-fg-color: #e9e641;
   --doc-symbol-itf-fg-color: #e96341;
+  --doc-symbol-gvl-fg-color: #41e9e9;
 
   --doc-symbol-variable-bg-color: #df50af1a;
   --doc-symbol-property-bg-color: #9538001a;
@@ -83,6 +84,7 @@
   --doc-symbol-plcproject-bg-color: #5cad0f1a;
   --doc-symbol-dut-bg-color: #e9e6411a;
   --doc-symbol-itf-bg-color: #e963411c;
+  --doc-symbol-gvl-bg-color: #41e9e927;
 }
 
 [data-md-color-scheme="slate"] {
@@ -94,6 +96,7 @@
   --doc-symbol-plcproject-fg-color: #baff79;
   --doc-symbol-dut-fg-color: #eeec79;
   --doc-symbol-itf-fg-color: #f0795b;
+  --doc-symbol-gvl-fg-color: #9ce9e9;
 
   --doc-symbol-variable-bg-color: #ffa8cc1a;
   --doc-symbol-property-bg-color: #ffa6571a;
@@ -103,6 +106,7 @@
   --doc-symbol-plcproject-bg-color: #baff791a;
   --doc-symbol-dut-bg-color: #eeec791f;
   --doc-symbol-itf-bg-color: #e08a742a;
+  --doc-symbol-gvl-bg-color: #9ce9e921;
 }
 
 
@@ -131,6 +135,16 @@ a code.doc-symbol-dut {
 
 code.doc-symbol-dut::after {
   content: "dut";
+}
+
+code.doc-symbol-gvl,
+a code.doc-symbol-gvl {
+  color: var(--doc-symbol-gvl-fg-color);
+  background-color: var(--doc-symbol-gvl-bg-color);
+}
+
+code.doc-symbol-gvl::after {
+  content: "gvl";
 }
 
 code.doc-symbol-itf,
@@ -196,76 +210,7 @@ code.doc-symbol-plcproject::after {
 
 
 
-code.doc-symbol-dut,
-a code.doc-symbol-dut {
-  color: var(--doc-symbol-dut-fg-color);
-  background-color: var(--doc-symbol-dut-bg-color);
-}
 
-code.doc-symbol-dut::after {
-  content: "dut";
-}
-
-code.doc-symbol-interface,
-a code.doc-symbol-interface {
-  color: var(--doc-symbol-interface-fg-color);
-  background-color: var(--doc-symbol-interface-bg-color);
-}
-
-code.doc-symbol-interface::after {
-  content: "itf";
-}
-
-.doc-signature .autorefs {
-  color: inherit;
-  border-bottom: 1px dotted currentcolor;
-}
-
-/* TwinCAT specific styles */
-.doc-label {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  margin: 0 0.2rem;
-  border-radius: 0.2rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: white;
-}
-
-.doc-label-pou {
-  background-color: var(--doc-symbol-pou-fg-color);
-}
-
-.doc-label-dut {
-  background-color: var(--doc-symbol-dut-fg-color);
-}
-
-.doc-label-interface {
-  background-color: var(--doc-symbol-interface-fg-color);
-}
-
-.doc-label-property {
-  background-color: var(--doc-symbol-property-fg-color);
-}
-
-.doc-label-method {
-  background-color: var(--doc-symbol-method-fg-color);
-}
-
-.doc-label-access {
-  background-color: #6c757d;
-}
-
-.doc-label-plcproject {
-  background-color: #0550ae;
-}
-
-/* TwinCAT variable table styles */
-.doc-variables {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
 
 .doc-variables th {
   background-color: var(--md-default-fg-color--lightest);

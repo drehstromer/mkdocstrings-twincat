@@ -147,6 +147,24 @@ class SummaryOption:
         ),
     ] = False
 
+    gvls: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of gvls.",
+        ),
+    ] = False
+
+    variables: Annotated[
+        bool,
+        _Field(
+            group="members",
+            parent="summary",
+            description="Whether to render summaries of variables.",
+        ),
+    ] = False
+
 
 # The input config class is useful to generate a JSON schema, see scripts/mkdocs_hooks.py.
 # YORE: EOL 3.9: Replace `**_dataclass_options` with `frozen=True, kw_only=True` within line.
@@ -318,6 +336,7 @@ class TwincatInputOptions:
     ] = False
 
 
+
     variable_section_style: Annotated[
         Literal["table", "list"],
         _Field(
@@ -340,9 +359,9 @@ class TwincatInputOptions:
         if "summary" in data:
             summary = data["summary"]
             if summary is True:
-                summary = SummaryOption(properties=True, methods=True, pous=True, itfs=True, duts=True)
+                summary = SummaryOption(properties=True, methods=True, pous=True, itfs=True, duts=True, gvls=True, variables=True)
             elif summary is False:
-                summary = SummaryOption(properties=False, methods=False, pous=False, itfs=False, duts=False)
+                summary = SummaryOption(properties=False, methods=False, pous=False, itfs=False, duts=False, gvls=False, variables=False)
             else:
                 summary = SummaryOption(**summary)
             data["summary"] = summary

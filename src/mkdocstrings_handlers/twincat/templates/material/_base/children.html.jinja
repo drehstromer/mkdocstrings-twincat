@@ -3,12 +3,12 @@
 This template iterates on members of a given object and renders them.
 
 Context:
-  context plcproj, pou, itf: The object to render.
+  context plcproj, pou, itf, method: The object to render.
   config (dict): The configuration options.
   heading_level (int): The HTML heading level to use.
 -#}
 
-{% if context.pous or context.itfs or context.duts or context.methods or context.properties %}
+{% if context.pous or context.itfs or context.duts or context.methods or context.properties or context.gvls or context.variables%}
   <div class="doc doc-children">
 
         {% if config.show_category_heading %}
@@ -42,11 +42,22 @@ Context:
 
           {% if context.duts %}
             {% if config.show_category_heading %}
-              {% filter heading(heading_level, id=html_id ~ "-interfaces") %}Interfaces{% endfilter %}
+              {% filter heading(heading_level, id=html_id ~ "-interfaces") %}User Datatypes{% endfilter %}
             {% endif %}
             {% with heading_level = heading_level + extra_level %}
               {% for dut in context.duts %}
                   {% include "dut.html.jinja" with context %}
+              {% endfor %}
+            {% endwith %}
+          {% endif %}
+
+          {% if context.gvls %}
+            {% if config.show_category_heading %}
+              {% filter heading(heading_level, id=html_id ~ "-globalvariablelists") %}Global Variable Lists{% endfilter %}
+            {% endif %}
+            {% with heading_level = heading_level + extra_level %}
+              {% for gvl in context.gvls %}
+                  {% include "gvl.html.jinja" with context %}
               {% endfor %}
             {% endwith %}
           {% endif %}
@@ -72,6 +83,46 @@ Context:
                   {% include "property.html.jinja" with context %}
               {% endfor %}
             {% endwith %}
+          {% endif %}
+
+
+          {% if context.variables %}
+            {% set var_inputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
+            {% set var_inouts = context.variables|selectattr("section_type", "equalto", "var_in_out") %}
+            {% set var_outputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
+
+            {% if var_inputs %}
+              {% if config.show_category_heading %}
+                {% filter heading(heading_level, id=html_id ~ "-varinputs") %}Inputs{% endfilter %}
+              {% endif %}
+              {% with heading_level = heading_level + extra_level %}
+                {% for variable in var_inputs %}
+                    {% include "variable.html.jinja" with context %}
+                {% endfor %}
+              {% endwith %}
+            {% endif %}
+
+            {% if var_inouts %}
+              {% if config.show_category_heading %}
+                {% filter heading(heading_level, id=html_id ~ "-varinputs") %}In/Outputs{% endfilter %}
+              {% endif %}
+              {% with heading_level = heading_level + extra_level %}
+                {% for variable in var_inouts %}
+                    {% include "variable.html.jinja" with context %}
+                {% endfor %}
+              {% endwith %}
+            {% endif %}
+
+            {% if var_outputs %}
+              {% if config.show_category_heading %}
+                {% filter heading(heading_level, id=html_id ~ "-varinputs") %}Outputs{% endfilter %}
+              {% endif %}
+              {% with heading_level = heading_level + extra_level %}
+                {% for variable in var_outputs %}
+                    {% include "variable.html.jinja" with context %}
+                {% endfor %}
+              {% endwith %}
+            {% endif %}
           {% endif %}
 
       {% endwith %}

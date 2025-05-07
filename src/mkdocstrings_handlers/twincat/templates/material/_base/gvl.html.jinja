@@ -1,16 +1,16 @@
-{#- Template for TwinCAT dut
+{#- Template for TwinCAT gvl
 
-This template renders a TwinCAT dut
+This template renders a TwinCAT gvl
 Context:
-  dut: The dut object to render.
+  gvl: The gvl object to render.
   root (bool): Whether this is the root object, injected with `:::` in a Markdown page.
   heading_level (int): The HTML heading level to use.
   config (dict): The configuration options.
 -#}
 
 
-<div class="doc doc-object doc-dut">
-  {% with obj = dut, html_id = dut.get_identifier() %}
+<div class="doc doc-object doc-gvl">
+  {% with obj = gvl, html_id = gvl.get_identifier() %}
 
     {% if root %}
       {% set show_full_path = config.show_root_full_path %}
@@ -22,33 +22,33 @@ Context:
       {% set show_full_path = config.show_object_full_path %}
     {% endif %}
 
-    {% set dut_name = dut.get_identifier() if show_full_path else dut.name %}
+    {% set gvl_name = gvl.get_identifier() if show_full_path else gvl.name %}
 
     {% if not root or config.show_root_heading %}
       {% filter heading(
           heading_level,
-          role="dut",
+          role="gvl",
           id=html_id,
           class="doc doc-heading",
-          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-dut"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else dut.name),
+          toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-gvl"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else gvl.name),
         ) %}
 
         {% block heading scoped %}
           {#- Heading block.
 
-          This block renders the heading for the dut.
+          This block renders the heading for the gvl.
           -#}
-          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-dut"></code>{% endif %}
-          <span class="doc doc-object-name doc-dut-name">{{ config.heading if config.heading and root else dut_name }}</span>
+          {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-gvl"></code>{% endif %}
+          <span class="doc doc-object-name doc-gvl-name">{{ config.heading if config.heading and root else gvl_name }}</span>
         {% endblock heading %}
 
       {% endfilter %}
     {% else %}
       {% if config.show_root_toc_entry %}
         {% filter heading(heading_level,
-            role="dut",
+            role="gvl",
             id=html_id,
-            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-dut"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else dut.name),
+            toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-gvl"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else gvl.name),
             hidden=True,
           ) %}
         {% endfilter %}
@@ -60,7 +60,7 @@ Context:
       {% block contents scoped %}
         {#- Contents block.
 
-        This block renders the contents of the dut.
+        This block renders the contents of the gvl.
         It contains other blocks that users can override.
         Overriding the contents block allows to rearrange the order of the blocks.
         -#}
@@ -69,10 +69,10 @@ Context:
         {% block docstring scoped %}
           {#- Docstring block.
 
-          This block renders the documentation for the dut.
+          This block renders the documentation for the gvl.
           -#}
 
-            {% with documentation=dut.documentation %}
+            {% with documentation=gvl.documentation %}
                 {% include "documentation.html.jinja"%}
             {% endwith %}          
         {% endblock docstring %}
@@ -81,32 +81,35 @@ Context:
         {% block declaration scoped %}
           {#- declaration block.
 
-          This block renders the declaration for the dut.
+          This block renders the declaration for the gvl.
           -#}
 
-          {% if dut.declaration and config.show_source %}
+          {% if gvl.declaration and config.show_source %}
             <details class="quote">
               <summary>"Source Code" </summary>
-              {{ dut.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
+              {{ gvl.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>
           {% endif %}
         {% endblock declaration %}
 
+
+
+
         {% block variables scoped %}
           {#- Variables block.
 
-          This block renders the variables for the dut.
+          This block renders the variables for the gvl.
           -#}
 
           {% set root = False %}
           {% set heading_level = heading_level + 1 %}
 
-            {% if dut.variables %}
+            {% if gvl.variables %}
               {% if config.show_category_heading %}
                 {% filter heading(heading_level, id=html_id ~ "-variables") %}Variables{% endfilter %}
               {% endif %}
-              {% with heading_level = heading_level + extra_level %}
-                {% for variable in dut.variables %}
+              {% with heading_level = heading_level %}
+                {% for variable in gvl.variables %}
                     {% include "variable.html.jinja" with context %}
                 {% endfor %}
               {% endwith %}
@@ -114,9 +117,8 @@ Context:
           
         {% endblock variables %}
 
-
-
       {% endblock contents %}
+
     </div>
 
   {% endwith %}

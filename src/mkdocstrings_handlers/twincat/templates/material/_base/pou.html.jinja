@@ -109,46 +109,22 @@ Context:
         {% endblock summary %}
 
 
-
-        {% block variables scoped %}
-          {#- Variables block.
-
-          This block renders the variables for the POU.
-          -#}
-            {% with variable_sections=pou.variable_sections %}
-                {% include "variable_section.html.jinja"%}
-            {% endwith %}   
-          
-        {% endblock variables %}
-
-
-        {% block declaration scoped %}
+        {% block sourcecode scoped %}
           {#- declaration block.
 
           This block renders the declaration for the POU.
           -#}
 
-          {% if pou.declaration and config.show_source %}
+          {% if (pou.declaration or pou.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Declaration" </summary>
+              <summary>"Source Code" </summary>
               {{ pou.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
-            </details>
-          {% endif %}
-        {% endblock declaration %}
-
-        {% block implementation scoped %}
-          {#- Implementation block.
-
-          This block renders the implementation for the POU.
-          -#}
-
-          {% if pou.implementation and config.show_source %}
-            <details class="quote">
-              <summary>"Implementation" </summary>
               {{ pou.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>
           {% endif %}
-        {% endblock implementation %}
+        {% endblock sourcecode %}
+
+
 
         {% block children scoped %}
           {#- Children block.

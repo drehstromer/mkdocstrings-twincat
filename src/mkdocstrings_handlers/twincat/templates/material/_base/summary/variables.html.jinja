@@ -1,0 +1,153 @@
+{#- Template for variables summary
+
+
+Context:
+  context pou, dut, method
+-#}
+
+{% set var_inputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
+{% set var_inouts = context.variables|selectattr("section_type", "equalto", "var_in_out") %}
+{% set var_outputs = context.variables|selectattr("section_type", "equalto", "var_input") %}
+
+
+
+  {% if config.summary_section_style == "table" %}
+    {% block table_style scoped %}
+    {% if var_inputs %}
+      {#- Block for the `table` section style. -#}
+      <p><span class="doc-section-title">Inputs</span></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for var in var_inputs %}
+            <tr class="doc-section-item">
+              <td><code><autoref identifier="{{ var.get_identifier() }}" optional hover>{{ var.name }}</autoref></code></td>
+              <td>
+              {% if var.documentation and var.documentation.details %}
+                <div class="doc-md-description">
+                  {{ var.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+    {% if var_outputs %}
+      {#- Block for the `table` section style. -#}
+      <p><span class="doc-section-title">Outputs</span></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for var in var_outputs %}
+            <tr class="doc-section-item">
+              <td><code><autoref identifier="{{ var.get_identifier() }}" optional hover>{{ var.name }}</autoref></code></td>
+              <td>
+              {% if var.documentation and var.documentation.details %}
+                <div class="doc-md-description">
+                  {{ var.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+    {% if var_inouts %}
+      {#- Block for the `table` section style. -#}
+      <p><span class="doc-section-title">In/Outputs</span></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for var in var_inouts %}
+            <tr class="doc-section-item">
+              <td><code><autoref identifier="{{ var.get_identifier() }}" optional hover>{{ var.name }}</autoref></code></td>
+              <td>
+              {% if var.documentation and var.documentation.details %}
+                <div class="doc-md-description">
+                  {{ var.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+    {% endblock table_style %}
+
+
+  {% elif config.summary_section_style == "list" %}
+    {% block list_style scoped %}
+    {% if var_inputs %}
+      {#- Block for the `list` section style. -#}
+      <p><span class="doc-section-title">Inputs</span></p>
+      <ul>
+        {% for var in var_inputs %}
+          <li class="doc-section-item field-body">
+            <b><code><autoref identifier="{{ var.get_identifier() }}" optional hover>{{ var.name }}</autoref></code></b>
+            {% if var.documentation and var.documentation.details %}
+            –
+            <div class="doc-md-description">
+              {{ var.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+            </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if var_outputs %}
+      {#- Block for the `list` section style. -#}
+      <p><span class="doc-section-title">Outputs</span></p>
+      <ul>
+        {% for var in var_outputs %}
+          <li class="doc-section-item field-body">
+            <b><code><autoref identifier="{{ var.get_identifier() }}" optional hover>{{ var.name }}</autoref></code></b>
+            {% if var.documentation and var.documentation.details %}
+            –
+            <div class="doc-md-description">
+              {{ var.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+            </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+  {% endif %}
+
+  {% if var_inouts %}
+      {#- Block for the `list` section style. -#}
+      <p><span class="doc-section-title">In/Outputs</span></p>
+      <ul>
+        {% for var in var_inouts %}
+          <li class="doc-section-item field-body">
+            <b><code><autoref identifier="{{ var.get_identifier() }}" optional hover>{{ var.name }}</autoref></code></b>
+            {% if var.documentation and var.documentation.details %}
+            –
+            <div class="doc-md-description">
+              {{ var.documentation.details|convert_markdown(heading_level, html_id, autoref_hook=autoref_hook) }}
+            </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+  {% endif %}
+  {% endblock list_style %}
+{% endif %}

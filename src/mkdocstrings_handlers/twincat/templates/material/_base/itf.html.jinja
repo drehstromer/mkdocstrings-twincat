@@ -107,33 +107,22 @@ Context:
 
 
 
-        {% block declaration scoped %}
+        {% block sourcecode scoped %}
           {#- declaration block.
 
           This block renders the declaration for the itf.
           -#}
 
-          {% if itf.declaration and config.show_source %}
+          {% if (itf.declaration or itf.implementation) and config.show_source %}
             <details class="quote">
-              <summary>"Declaration" </summary>
+              <summary>"Source Code" </summary>
               {{ itf.declaration|highlight(language="pascal", linestart=0, linenums=True) }}
-            </details>
-          {% endif %}
-        {% endblock declaration %}
-
-        {% block implementation scoped %}
-          {#- Implementation block.
-
-          This block renders the implementation for the itf.
-          -#}
-
-          {% if itf.implementation and config.show_source %}
-            <details class="quote">
-              <summary>"Implementation" </summary>
               {{ itf.implementation|highlight(language="pascal", linestart=0, linenums=True) }}
             </details>
           {% endif %}
-        {% endblock implementation %}
+        {% endblock sourcecode %}
+
+
 
         {% block children scoped %}
           {#- Children block.

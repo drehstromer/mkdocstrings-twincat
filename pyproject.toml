@@ -7,7 +7,7 @@ name = "mkdocstrings-twincat"
 description = "A Twincat handler for mkdocstrings."
 authors = [{name = "drehstromer", email = "privat@samuelruckli.ch"}]
 license = "MIT"
-version = "0.1.110"
+version = "0.1.121"
 license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
