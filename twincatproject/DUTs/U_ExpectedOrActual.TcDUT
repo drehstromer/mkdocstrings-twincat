@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="U_ExpectedOrActual" Id="{539c30a7-a560-469c-8422-aaf8c09f45d9}">
+    <Declaration><![CDATA[TYPE U_ExpectedOrActual :
+UNION
+    boolExpectedOrActual : BOOL;
+    bitExpectedOrActual : BIT;
+    byteExpectedOrActual : BYTE;
+    dwordExpectedOrActual : DWORD;
+    lwordExpectedOrActual : LWORD;
+    stringExpectedOrActual : T_MaxString;
+    udintExpectedOrActual : UDINT;
+    uintExpectedOrActual : UINT;
+    usintExpectedOrActual : USINT;
+    sintExpectedOrActual : SINT;
+    intExpectedOrActual : INT;
+    wordExpectedOrActual : WORD;
+    dintExpectedOrActual : DINT;
+    lintExpectedOrActual : LINT;
+    ulintExpectedOrActual : ULINT;
+    realExpectedOrActual : REAL;
+    lrealExpectedOrActual : LREAL;
+    wstringExpectedOrActual : WSTRING(255);
+    timeExpectedOrActual : TIME;
+    ltimeExpectedOrActual : LTIME;
+    dateExpectedOrActual : DATE;
+    dateandtimeExpectedOrActual : DATE_AND_TIME;
+    timeofdayExpectedOrActual : TIME_OF_DAY;
+END_UNION
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

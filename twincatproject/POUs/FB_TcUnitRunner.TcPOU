@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_TcUnitRunner" Id="{857e16d6-a26c-468a-935e-aa7317c263b9}" SpecialFunc="None">
+    <Declaration><![CDATA[// This function block is responsible for holding track of the tests and executing them.
+FUNCTION_BLOCK FB_TcUnitRunner
+VAR
+    // Indication of whether all test suites have reported that they are finished
+    AllTestSuitesFinished : BOOL := FALSE;
+    AllTestSuitesFinishedTrigger : R_TRIG;
+
+    //Test result information
+    TestResults : FB_TestResults;
+
+    (* Prints the results to ADS so that Visual Studio can display the results.
+       This test result formatter can be replaced with something else than ADS *)
+    AdsTestResultLogger : FB_AdsTestResultLogger(TestResults);
+    TestResultLogger : I_TestResultLogger := AdsTestResultLogger;
+
+    (* If this flag is set, it means that some external event triggered the
+       request to abort running the test suites *)
+    AbortRunningTestSuites : BOOL;
+
+    // Publishes a xUnit compatible XML file
+    xUnitXmlPublisher : FB_xUnitXmlPublisher(TestResults);
+    XmlTestResultPublisher : I_TestResultLogger := xUnitXmlPublisher;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="AbortRunningTestSuiteTests" Id="{3fcbd569-749a-493c-a697-2c976fa6e96a}">
+      <Declaration><![CDATA[(* This function sets a flag which makes the runner stop running the tests
+   in the test suites *)
+METHOD INTERNAL AbortRunningTestSuiteTests]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AbortRunningTestSuites := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RunTestSuiteTests" Id="{d333e6c4-a1da-4b5b-91b3-4b4808e6c299}">
+      <Declaration><![CDATA[// This runs all the test suites in parallel
+METHOD INTERNAL RunTestSuiteTests
+VAR
+    Counter : UINT := 0;
+    BusyPrinting : BOOL;
+    (* We need to hold a temporary state of the statistics 
+       as we don't consider the tests to be completely finished until all test suites have executed completely.
+       The reason we want to do it this way is because a test suite can run over several cycles. Only once all tests
+       are finished (which might take many cycles), do we gather correct statistics *)
+    NumberOfTestSuitesFinished : UINT := 0;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF GVL_TcUnit.StartedAt = 0 THEN
+    GVL_TcUnit.StartedAt := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter);
+END_IF
+
+// Run TcUnit test suites
+IF NOT AllTestSuitesFinished THEN
+    IF GVL_TcUnit.NumberOfInitializedTestSuites = 0 THEN
+        AllTestSuitesFinished := TRUE;
+    ELSIF GVL_TcUnit.NumberOfInitializedTestSuites > 0 THEN
+        FOR Counter := 1 TO GVL_TcUnit.NumberOfInitializedTestSuites BY 1 DO
+            IF GVL_TcUnit.TestSuiteAddresses[Counter]^.AreAllTestsFinished() THEN
+                NumberOfTestSuitesFinished := NumberOfTestSuitesFinished + 1;
+            ELSE
+                GVL_TcUnit.CurrentTestSuiteBeingCalled := GVL_TcUnit.TestSuiteAddresses[Counter];
+				GVL_TcUnit.CurrentTestSuiteBeingCalled^.SetStartedAtIfNotSet(Timestamp := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter));
+                GVL_TcUnit.CurrentTestSuiteBeingCalled^();
+				// This is not an efficient way to set the duration
+				IF GVL_TcUnit.TestSuiteAddresses[Counter]^.AreAllTestsFinished() THEN
+					GVL_TcUnit.CurrentTestSuiteBeingCalled^.CalculateDuration(FinishedAt := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter));
+				END_IF
+            END_IF
+        END_FOR
+        (* Check if some event triggered an abortion of running the tests, in that case abort it now.
+           This can be accomplished by setting the result of the test suites run to finished. *)
+        IF AbortRunningTestSuites THEN
+            NumberOfTestSuitesFinished := GVL_TcUnit.NumberOfInitializedTestSuites;
+        END_IF
+
+        IF NumberOfTestSuitesFinished = GVL_TcUnit.NumberOfInitializedTestSuites THEN
+            AllTestSuitesFinished := TRUE;
+        END_IF
+    END_IF
+END_IF
+
+// Store test suite results continuously
+TestResults();
+
+// Log test suite results continuously
+TestResultLogger.LogTestSuiteResults();
+
+// Publish the xUnit Xml file once if enabled
+XmlTestResultPublisher.LogTestSuiteResults();
+
+// Run the buffered ADS logger
+GVL_TcUnit.AdsMessageQueue();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RunTestSuiteTestsInSequence" Id="{01bbc2d3-b1c5-4bce-a3f3-fa46a50fd167}">
+      <Declaration><![CDATA[// This runs all the test suites in sequence (one after the other)
+METHOD INTERNAL RunTestSuiteTestsInSequence
+VAR_INPUT
+    TimeBetweenTestSuitesExecution : TIME; // Time delay between a test suite is finished and the next test suite starts
+END_VAR
+VAR
+    BusyPrinting : BOOL;
+    (* We need to hold a temporary state of the statistics
+       as we don't consider the tests to be completely finished until all test suites have executed completely.
+       The reason we want to do it this way is because a test suite can run over several cycles. Only once all tests
+       are finished (which might take many cycles), do we gather correct statistics *)
+    NumberOfTestSuitesFinished : UINT := 0;
+END_VAR
+VAR_INST
+    (* This variable holds which current test suite is being called, as we are running
+       each one in a sequence (one by one) *)
+     CurrentlyRunningTestSuite : UINT := 1;
+     TimerBetweenExecutionOfTestSuites : TOF;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF GVL_TcUnit.StartedAt = 0 THEN
+    GVL_TcUnit.StartedAt := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter);
+END_IF
+
+TimerBetweenExecutionOfTestSuites(PT := TimeBetweenTestSuitesExecution);
+// Run TcUnit test suites
+IF NOT AllTestSuitesFinished THEN
+    IF GVL_TcUnit.NumberOfInitializedTestSuites = 0 THEN
+        AllTestSuitesFinished := TRUE;
+    ELSIF GVL_TcUnit.NumberOfInitializedTestSuites > 0 THEN
+        IF TimerBetweenExecutionOfTestSuites.Q THEN
+            TimerBetweenExecutionOfTestSuites.IN := FALSE;
+        END_IF
+        IF GVL_TcUnit.TestSuiteAddresses[CurrentlyRunningTestSuite]^.AreAllTestsFinished() THEN
+            IF CurrentlyRunningTestSuite <> GVL_TcUnit.NumberOfInitializedTestSuites THEN
+                NumberOfTestSuitesFinished := NumberOfTestSuitesFinished + 1;
+                CurrentlyRunningTestSuite := CurrentlyRunningTestSuite + 1;
+                TimerBetweenExecutionOfTestSuites.IN := TRUE;
+				GVL_TcUnit.CurrentTestSuiteBeingCalled^.CalculateDuration(FinishedAt := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter));
+            END_IF
+        ELSIF NOT TimerBetweenExecutionOfTestSuites.Q THEN
+            GVL_TcUnit.CurrentTestSuiteBeingCalled := GVL_TcUnit.TestSuiteAddresses[CurrentlyRunningTestSuite];
+			GVL_TcUnit.CurrentTestSuiteBeingCalled^.SetStartedAtIfNotSet(Timestamp := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter));
+            GVL_TcUnit.CurrentTestSuiteBeingCalled^();
+			// This is not an efficient way to set the duration
+			IF GVL_TcUnit.TestSuiteAddresses[CurrentlyRunningTestSuite]^.AreAllTestsFinished() THEN
+				GVL_TcUnit.CurrentTestSuiteBeingCalled^.CalculateDuration(FinishedAt := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter));
+			END_IF
+        END_IF
+        (* Check if some event triggered an abortion of running the tests, in that case abort it now.
+           This can be accomplished by setting the result of the test suites run to finished. *)
+        IF AbortRunningTestSuites THEN
+            NumberOfTestSuitesFinished := GVL_TcUnit.NumberOfInitializedTestSuites;
+        END_IF
+        IF NumberOfTestSuitesFinished = GVL_TcUnit.NumberOfInitializedTestSuites THEN
+            AllTestSuitesFinished := TRUE;
+        END_IF
+    END_IF
+END_IF
+
+// Store test suite results continuously
+TestResults();
+
+// Log test suite results continuously
+TestResultLogger.LogTestSuiteResults();
+
+// Publish the xUnit Xml file once if enabled
+XmlTestResultPublisher.LogTestSuiteResults();
+
+// Run the buffered ADS logger
+GVL_TcUnit.AdsMessageQueue();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AdsAssertMessageFormatter" Id="{54911d7d-b4a4-43a8-a981-a2fc14a13f71}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+    This function block is responsible for printing the results of the assertions using the built-in
+    ADSLOGSTR functionality provided by the Tc2_System library. This sends the result using ADS, which
+    is consumed by the error list of Visual Studio.
+*)
+FUNCTION_BLOCK FB_AdsAssertMessageFormatter IMPLEMENTS I_AssertMessageFormatter]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="LogAssertFailure" Id="{48cbc6b0-5380-44b8-a045-57b6ad9f189d}">
+      <Declaration><![CDATA[METHOD PUBLIC LogAssertFailure
+VAR_INPUT
+    Expected : T_MaxString;
+    Actual : T_MaxString;
+    Message : T_MaxString;
+    TestInstancePath : T_MaxString;
+END_VAR
+VAR
+    AdjustAssertFailureMessageToMax253CharLength : FB_AdjustAssertFailureMessageToMax253CharLength;
+    TestInstancePathCleaned : T_MaxString;
+    TestInstancePathFinal : T_MaxString;
+    ReturnValue : DINT;
+    TestInstancePathProcessed : T_MaxString;
+    MessageProcessed : T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestInstancePathCleaned := F_RemoveInstancePathAndProjectNameFromTestInstancePath(TestInstancePath);
+TestInstancePathFinal := CONCAT(STR1 := 'FAILED TEST $'',
+                                STR2 := TestInstancePathCleaned);
+TestInstancePathFinal := CONCAT(STR1 := TestInstancePathFinal,
+                                STR2 := '$'');
+
+TestInstancePathFinal := CONCAT(STR1 := TestInstancePathFinal,
+                                STR2 := ', EXP: ');
+TestInstancePathFinal := CONCAT(STR1 := TestInstancePathFinal,
+                                STR2 := Expected);
+TestInstancePathFinal := CONCAT(STR1 := TestInstancePathFinal,
+                                STR2 := ', ACT: ');
+TestInstancePathFinal := CONCAT(STR1 := TestInstancePathFinal,
+                                STR2 := Actual);
+IF LEN(STR := Message) > 0 THEN
+    TestInstancePathFinal := CONCAT(STR1 := TestInstancePathFinal,
+                                    STR2 := ', MSG: %s');
+END_IF
+
+AdjustAssertFailureMessageToMax253CharLength(TestInstancePath := TestInstancePathFinal,
+                                             TestMessage := Message,
+                                             TestInstancePathProcessed => TestInstancePathProcessed,
+                                             TestMessageProcessed => MessageProcessed);
+
+GVL_TcUnit.AdsMessageQueue.WriteLog(MsgCtrlMask := ADSLOG_MSGTYPE_ERROR,
+                                    MsgFmtStr := TestInstancePathProcessed,
+                                    StrArg := MessageProcessed);]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

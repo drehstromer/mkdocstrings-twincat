@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="TEST_FINISHED" Id="{9922b45b-fca5-4323-be8f-93710371a816}" SpecialFunc="None">
+    <Declaration><![CDATA[// Sets the currently running test as finished
+FUNCTION TEST_FINISHED : BOOL
+VAR
+    TestName : T_MaxString;
+    Counter : UINT := 0;
+    FinishedAt : LWORD;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Get the timestamp directly when the test has finished
+FinishedAt := F_GetCpuCounterAs64bit(GVL_TcUnit.GetCpuCounter);
+
+// Grab the currently running test name
+TestName := GVL_TcUnit.CurrentTestNameBeingCalled;
+
+TEST_FINISHED := FALSE;
+(* Find the test suite and:
+   1. Set the test in that test suite as finished
+   2. Calculate and set the number of asserts made for that test
+*)
+FOR Counter := 1 TO GVL_TcUnit.NumberOfInitializedTestSuites BY 1 DO
+    IF GVL_TcUnit.TestSuiteAddresses[Counter] = GVL_TcUnit.CurrentTestSuiteBeingCalled THEN
+        GVL_TcUnit.TestSuiteAddresses[Counter]^.SetTestFinished(TestName := GVL_TcUnit.CurrentTestNameBeingCalled, FinishedAt := FinishedAt);
+        GVL_TcUnit.TestSuiteAddresses[Counter]^.CalculateAndSetNumberOfAssertsForTest(TestName := GVL_TcUnit.CurrentTestNameBeingCalled);
+        GVL_TcUnit.CurrentTestIsFinished := TRUE;
+        TEST_FINISHED := TRUE;
+        RETURN;
+    END_IF
+END_FOR]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

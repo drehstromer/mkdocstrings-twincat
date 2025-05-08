@@ -4,7 +4,7 @@ site_url: "https://drehstromer.github.io/mkdocstrings-twincat"
 repo_url: "https://github.com/drehstromer/mkdocstrings-twincat"
 repo_name: "drehstromer/mkdocstrings-twincat"
 site_dir: "site"
-watch: [mkdocs.yml, README.md, CONTRIBUTING.md, CHANGELOG.md, src/mkdocstrings_handlers]
+watch: [mkdocs.yml, README.md, src/mkdocstrings_handlers]
 copyright: Copyright &copy; 2025 drehstromer
 edit_uri: edit/main/docs/
 
@@ -16,22 +16,17 @@ validation:
 nav:
 - Home:
   - Overview: index.md
-  - Changelog: changelog.md
-  - Credits: credits.md
-  - License: license.md
 - Usage:
   - usage/index.md
   - Configuration:
     - usage/configuration/index.md
     - General: usage/configuration/general.md
     - Headings: usage/configuration/headings.md
+    - Documentation: usage/configuration/documentation.md
   - Customization: usage/customization.md
+- Demo: reference/tcunit.md
 - API reference: reference/api.md
-- Development:
-  - Contributing: contributing.md
-  - Code of Conduct: code_of_conduct.md
-  - Coverage report: coverage.md
-  - mkdocstrings: https://mkdocstrings.github.io/
+- Awesome mkdocstrings: https://mkdocstrings.github.io/
 
 theme:
   name: material
@@ -114,7 +109,6 @@ plugins:
 - autorefs
 - markdown-exec
 - section-index
-- coverage
 - mkdocstrings:
     handlers:
       python:
@@ -127,7 +121,6 @@ plugins:
           docstring_options:
             ignore_init_summary: true
           docstring_section_style: list
-          extensions: [scripts/griffe_extensions.py]
           filters: ["!^_"]
           heading_level: 1
           inherited_members: true
@@ -142,12 +135,16 @@ plugins:
           show_symbol_type_toc: true
           signature_crossrefs: true
           summary: true
-- llmstxt:
-    files:
-    - output: llms-full.txt
-      inputs:
-      - index.md
-      - reference/**.md
+      twincat:
+        paths: [twincatproject\TcUnit.plcproj]
+        options:
+          variable_section_style: list
+          summary_section_style: list
+          show_root_heading: true
+          show_source: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          summary: true
 - git-revision-date-localized:
     enabled: !ENV [DEPLOY, false]
     enable_creation_date: true
@@ -163,8 +160,6 @@ extra:
   social:
   - icon: fontawesome/brands/github
     link: https://github.com/drehstromer
-  - icon: fontawesome/brands/gitter
-    link: https://gitter.im/mkdocstrings-twincat/community
   - icon: fontawesome/brands/python
     link: https://pypi.org/project/mkdocstrings-twincat/
   analytics:

@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AssertResultStatic" Id="{9683a633-879e-475e-a97f-0742f9ecfd04}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+    This function block is responsible for keeping track of which asserts that have been made. The reason we need to
+    keep track of these is because if the user does the same assert twice (because of running a test suite over several
+    PLC-cycles) we want to know it so we don't print several times (if the assert fails).
+    An instance of an assert is keyed/identified with the following parameters as key:
+    - Value of expected
+    - Value of actual
+    - Message (string)
+    - Test instance path (string)
+*)
+FUNCTION_BLOCK FB_AssertResultStatic
+VAR
+    // The total number of instances of each of the "AssertResults"
+    AssertResults : ARRAY[1..GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite] OF ST_AssertResult;
+
+    // The total number of unique asserts
+    TotalAsserts : UINT := 0;
+
+    // Function block to get the current task cycle
+    GetCurrentTaskIndex : GETCURTASKINDEX;
+
+    // The total number of instances of each of the "AssertResults"
+    AssertResultInstances : ARRAY[1..GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite] OF ST_AssertResultInstances;
+
+    // The last PLC cycle count
+    CycleCount : UDINT;
+
+    // Only run first cycle
+    FirstCycleExecuted : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="AddAssertResult" Id="{22afb213-95b2-4bfd-ada6-e7cf020d9c1d}">
+      <Declaration><![CDATA[METHOD PRIVATE AddAssertResult
+VAR_INPUT
+    ExpectedSize : UDINT;
+    ExpectedTypeClass : IBaseLibrary.TypeClass;
+    ExpectedValue : POINTER TO BYTE;
+    ActualSize : UDINT;
+    ActualTypeClass : IBaseLibrary.TypeClass;
+    ActualValue : POINTER TO BYTE;
+    Message : T_MaxString;
+    TestInstancePath : T_MaxString;
+END_VAR
+VAR_INST
+	AssertResultOverflow : BOOL := FALSE;
+END_VAR
+VAR
+    sErrorString : T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF TotalAsserts < GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite THEN
+    TotalAsserts := TotalAsserts + 1;
+    AssertResults[TotalAsserts].Expected := F_AnyToUnionValue(AnySize := ExpectedSize, AnyTypeClass := ExpectedTypeClass, AnyValue := ExpectedValue);
+    AssertResults[TotalAsserts].Actual := F_AnyToUnionValue(AnySize := ActualSize, AnyTypeClass := ActualTypeClass, AnyValue := ActualValue);
+    AssertResults[TotalAsserts].Message := Message;
+    AssertResults[TotalAsserts].TestInstancePath := TestInstancePath;
+ELSE
+    IF NOT AssertResultOverflow THEN
+        sErrorString := CONCAT(STR1 := F_GetTestSuiteNameFromTestInstancePath(TestInstancePath := TestInstancePath),
+                               STR2 := '. Max number of assertions exceeded. Check parameter MaxNumberOfAssertsForEachTestSuite.');
+		GVL_TcUnit.AdsMessageQueue.WriteLog(msgCtrlMask := ADSLOG_MSGTYPE_ERROR,
+											msgFmtStr := sErrorString,
+											strArg := '');
+		AssertResultOverflow := TRUE;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CopyDetectionCountAndResetDetectionCountInThisCycle" Id="{a8cc95e0-191e-40c8-a6bc-8d58d9231bfa}">
+      <Declaration><![CDATA[METHOD PRIVATE CopyDetectionCountAndResetDetectionCountInThisCycle
+VAR
+    IteratorCounter : UINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR IteratorCounter := 1 TO GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite BY 1 DO
+    AssertResultInstances[IteratorCounter].DetectionCount := AssertResultInstances[IteratorCounter].DetectionCountThisCycle;
+    AssertResultInstances[IteratorCounter].DetectionCountThisCycle := 0;
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateAssertResultInstance" Id="{0e48fb23-038c-40ed-90ff-ee834be2653d}">
+      <Declaration><![CDATA[METHOD PRIVATE CreateAssertResultInstance
+VAR_INPUT
+    ExpectedSize : UDINT;
+    ExpectedTypeClass : IBaseLibrary.TypeClass;
+    ExpectedValue : POINTER TO BYTE;
+    ActualSize : UDINT;
+    ActualTypeClass : IBaseLibrary.TypeClass;
+    ActualValue : POINTER TO BYTE;
+    Message : T_MaxString;
+    TestInstancePath : T_MaxString;
+END_VAR
+VAR
+    IteratorCounter : UINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR IteratorCounter := 1 TO GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite BY 1 DO
+    IF AssertResultInstances[IteratorCounter].DetectionCount = 0 AND
+        AssertResultInstances[IteratorCounter].DetectionCountThisCycle = 0 THEN // Find first free spot
+        AssertResultInstances[IteratorCounter].AssertResult.Expected := F_AnyToUnionValue(AnySize := ExpectedSize, AnyTypeClass := ExpectedTypeClass, AnyValue := ExpectedValue);
+        AssertResultInstances[IteratorCounter].AssertResult.Actual := F_AnyToUnionValue(AnySize := ActualSize, AnyTypeClass := ActualTypeClass, AnyValue := ActualValue);
+        AssertResultInstances[IteratorCounter].AssertResult.Message := Message;
+        AssertResultInstances[IteratorCounter].AssertResult.TestInstancePath := TestInstancePath;
+        AssertResultInstances[IteratorCounter].DetectionCountThisCycle := 1;
+        EXIT;
+    END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetDetectionCount" Id="{75f01348-487a-4441-a0e3-f41feb6c1781}">
+      <Declaration><![CDATA[METHOD PRIVATE GetDetectionCount : UINT
+VAR_INPUT
+    ExpectedSize : UDINT;
+    ExpectedTypeClass : IBaseLibrary.TypeClass;
+    ExpectedValue : POINTER TO BYTE;
+    ActualSize : UDINT;
+    ActualTypeClass : IBaseLibrary.TypeClass;
+    ActualValue : POINTER TO BYTE;
+    Message : T_MaxString;
+    TestInstancePath : T_MaxString;
+END_VAR
+VAR
+    IteratorCounter : UINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR IteratorCounter := 1 TO GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite BY 1 DO
+    IF F_IsAnyEqualToUnionValue(ExpectedOrActual := AssertResultInstances[IteratorCounter].AssertResult.Expected,
+                                ExpectedOrActualSize := ExpectedSize,
+                                ExpectedOrActualTypeClass := ExpectedTypeClass,
+                                ExpectedOrActualValue := ExpectedValue) AND
+       F_IsAnyEqualToUnionValue(ExpectedOrActual := AssertResultInstances[IteratorCounter].AssertResult.Actual,
+                                ExpectedOrActualSize := ActualSize,
+                                ExpectedOrActualTypeClass := ActualTypeClass,
+                                ExpectedOrActualValue := ActualValue) AND
+        AssertResultInstances[IteratorCounter].AssertResult.Message = Message AND
+        AssertResultInstances[IteratorCounter].AssertResult.TestInstancePath = TestInstancePath THEN
+        GetDetectionCount := AssertResultInstances[IteratorCounter].DetectionCount;
+    END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetDetectionCountThisCycle" Id="{9f89a925-0785-44b9-83cb-36f87d5bc546}">
+      <Declaration><![CDATA[METHOD PRIVATE GetDetectionCountThisCycle : UINT
+VAR_INPUT
+    ExpectedSize : UDINT;
+    ExpectedTypeClass : IBaseLibrary.TypeClass;
+    ExpectedValue : POINTER TO BYTE;
+    ActualSize : UDINT;
+    ActualTypeClass : IBaseLibrary.TypeClass;
+    ActualValue : POINTER TO BYTE;
+    Message : T_MaxString;
+    TestInstancePath : T_MaxString;
+END_VAR
+VAR
+    IteratorCounter : UINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR IteratorCounter := 1 TO GVL_Param_TcUnit.MaxNumberOfAssertsForEachTestSuite BY 1 DO
+    IF F_IsAnyEqualToUnionValue(ExpectedOrActual := AssertResultInstances[IteratorCounter].AssertResult.Expected,
+                                ExpectedOrActualSize := ExpectedSize,
+                                ExpectedOrActualTypeClass := ExpectedTypeClass,
+                                ExpectedOrActualValue := ExpectedValue) AND
+       F_IsAnyEqualToUnionValue(ExpectedOrActual := AssertResultInstances[IteratorCounter].AssertResult.Actual,
+                                ExpectedOrActualSize := ActualSize,
+                                ExpectedOrActualTypeClass := ActualTypeClass,
+                                ExpectedOrActualValue := ActualValue) AND
+        AssertResultInstances[IteratorCounter].AssertResult.Message = Message AND
+        AssertResultInstances[IteratorCounter].AssertResult.Message = TestInstancePath THEN
+        GetDetectionCountThisCycle := AssertResultInstances[IteratorCounter].DetectionCountThisCycle;
+    END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetNumberOfAssertsForTest" Id="{a073fba3-9c9c-44bc-b792-f90e25f50f64}">
+      <Declaration><![CDATA[METHOD INTERNAL GetNumberOfAssertsForTest : UINT
+VAR_INPUT
+    CompleteTestInstancePath : T_MaxString;
+END_VAR
+VAR
+    Counter : UINT;
+    NumberOfAsserts : UINT := 0;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF TotalAsserts > 0 THEN
+    FOR Counter := 1 TO TotalAsserts BY 1 DO
+        IF AssertResults[Counter].TestInstancePath = CompleteTestInstancePath THEN
+            NumberOfAsserts := NumberOfAsserts + 1;
+        END_IF
+    END_FOR
+END_IF
+
+GetNumberOfAssertsForTest := NumberOfAsserts;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReportResult" Id="{675e4dfe-54f1-4dc0-a6fd-481bc63973c5}">
+      <Declaration><![CDATA[(*
+    This method is called in every assert and returns whether this particular assert has already been called.
+    The reason one would like to know whether this assert has already been reported or not is to not report it several
+    times to any logging service. Because a test-suite can consist of several tests, and certain tests can require the
+    test to run over several cycles it means that certain asserts could be called several times and thus we need to
+    keep track of which asserts we've already reported. The user of the framework should not need to care for any of
+    this and he/she should be able to call the asserts in any way they find suitable.
+
+    To know what assert this is we need to check for the total combination of:
+    - Test message
+    - Test instance path
+    - Expected value
+    - Actual value
+    Theoretically we can have a situation where a test has three different asserts, each and one with the same test
+    message/test instance path/actual value/expected value but called within the same or different cycles. In order for
+    us to handle all situations we need a simple algorithm that works according to:
+    - Keep track of how many instances the combination of test message/test instance path/expected value/actual value
+      we have. So for example, if we have called Assert(Exp := 5, Act := 5, 'Hello there', 'PRG.InstanceTestSuite.Test')
+      two times in one cycle, we have two instances of that combination. This is done according to:
+    - Iterate all existing reports.
+      - If we have a new PLC-cycle, set the current detection-count to zero.
+      - If new report does not match in any of the above fields, create it (together with current PLC-cycle).
+        Also store the information that we have one instance of this combination and +1 on the detection-count.
+      - If new report matches in all of the above, +1 in the detection-count. If this detection-count is larger than
+        the stored detection-count for this combination, create a new report and add +1 to the storage of
+        the detection-count.
+*)
+METHOD INTERNAL ReportResult
+VAR_INPUT
+    ExpectedSize : UDINT;
+    ExpectedTypeClass : IBaseLibrary.TypeClass;
+    ExpectedValue : POINTER TO BYTE;
+    ActualSize : UDINT;
+    ActualTypeClass : IBaseLibrary.TypeClass;
+    ActualValue : POINTER TO BYTE;
+    Message : T_MaxString;
+    TestInstancePath : T_MaxString;
+END_VAR
+VAR_OUTPUT
+    AlreadyReported : BOOL := FALSE;
+END_VAR
+VAR
+    LocationIndex : UINT;
+    DataTypesNotEquals : BOOL;
+    DataSizeNotEquals : BOOL;
+    DataContentNotEquals : BOOL;
+    CurrentCycleCount : UDINT;
+    IteratorCounter : UINT;
+    DetectionCountTemp : UINT := 0;
+    FoundOne : BOOL;
+    AdditionalIdenticalAssert : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT FirstCycleExecuted THEN
+    GetCurrentTaskIndex();
+    FirstCycleExecuted := TRUE;
+END_IF
+
+CurrentCycleCount := TwinCAT_SystemInfoVarList._TaskInfo[GetCurrentTaskIndex.index].CycleCount;
+(* Is current cycle the same as the last call to this method?
+   If not, reset the detection count *)
+IF CurrentCycleCount <> CycleCount THEN
+    CopyDetectionCountAndResetDetectionCountInThisCycle();
+END_IF
+
+FOR IteratorCounter := 1 TO TotalAsserts BY 1 DO
+      IF F_IsAnyEqualToUnionValue(ExpectedOrActual := AssertResultInstances[IteratorCounter].AssertResult.Expected,
+                                  ExpectedOrActualSize := ExpectedSize,
+                                  ExpectedOrActualTypeClass := ExpectedTypeClass,
+                                  ExpectedOrActualValue := ExpectedValue) AND
+         F_IsAnyEqualToUnionValue(ExpectedOrActual := AssertResultInstances[IteratorCounter].AssertResult.Actual,
+                                  ExpectedOrActualSize := ActualSize,
+                                  ExpectedOrActualTypeClass := ActualTypeClass,
+                                  ExpectedOrActualValue := ActualValue) AND
+        AssertResultInstances[IteratorCounter].AssertResult.Message = Message AND
+        AssertResultInstances[IteratorCounter].AssertResult.TestInstancePath = TestInstancePath THEN
+            AssertResultInstances[IteratorCounter].DetectionCountThisCycle :=
+                AssertResultInstances[IteratorCounter].DetectionCountThisCycle + 1;
+            FoundOne := TRUE;
+        IF AssertResultInstances[IteratorCounter].DetectionCountThisCycle >
+            AssertResultInstances[IteratorCounter].DetectionCount THEN // This assert is new
+            AdditionalIdenticalAssert := TRUE;
+        END_IF
+        EXIT;
+    END_IF
+END_FOR
+
+// If not found anything, create the first
+IF NOT FoundOne THEN
+    // No existing match found, create a new entry
+    AddAssertResult(ExpectedSize := ExpectedSize,
+                    ExpectedTypeClass := ExpectedTypeClass,
+                    ExpectedValue := ExpectedValue,
+                    ActualSize := ActualSize,
+                    ActualTypeClass := ActualTypeClass,
+                    ActualValue := ActualValue,
+                    Message := Message, TestInstancePath := TestInstancePath);
+
+    CreateAssertResultInstance(ExpectedSize := ExpectedSize,
+                               ExpectedTypeClass := ExpectedTypeClass,
+                               ExpectedValue := ExpectedValue,
+                               ActualSize := ActualSize,
+                               ActualTypeClass := ActualTypeClass,
+                               ActualValue := ActualValue,
+                               Message := Message, TestInstancePath := TestInstancePath);
+// An additional instance of this assert needs to be created
+ELSIF AdditionalIdenticalAssert THEN
+    AddAssertResult(ExpectedSize := ExpectedSize,
+                    ExpectedTypeClass := ExpectedTypeClass,
+                    ExpectedValue := ExpectedValue,
+                    ActualSize := ActualSize,
+                    ActualTypeClass := ActualTypeClass,
+                    ActualValue := ActualValue,
+                    Message := Message, TestInstancePath := TestInstancePath);
+// In all other cases, this assert has already been reported, we don't need to do anything
+ELSE
+    AlreadyReported := TRUE;
+END_IF
+
+// Update the cycle count
+CycleCount := TwinCAT_SystemInfoVarList._TaskInfo[GetCurrentTaskIndex.index].CycleCount;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

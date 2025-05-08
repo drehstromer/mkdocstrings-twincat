@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_Test" Id="{a51e9086-33ec-4162-acad-93a76961e893}" SpecialFunc="None">
+    <Declaration><![CDATA[// This function block holds all data that defines a test.
+FUNCTION_BLOCK FB_Test
+VAR
+    TestName : T_MaxString;
+    TestIsFinished : BOOL;
+    TestIsSkipped : BOOL; // This is set to true, if test is disabled (by putting the string "disabled_" in front of the test name
+    NumberOfAssertions : UINT;
+
+    (* In which order/sequence relative to the order tests should this test be executed/evaluated.
+       A value of 0 means it is not defined by TEST_ORDERED() but by un-ordered test (TEST()).
+       A value <> 0 tells in which order this test will be executed/evaluated. The lower the number, the earlier it will execute. *)
+    TestOrderNumber : UINT(0..GVL_Param_TcUnit.MaxNumberOfTestsForEachTestSuite); 
+
+    // Failure parameters. If TestIsFailed is TRUE, the other parameters will hold values as well
+    TestIsFailed : BOOL; // Indication of whether this test has at least one failed assert
+    AssertionMessage : T_MaxString; // Assertion message for the first assertion in this test
+    AssertionType : E_AssertionType; // Assertion type for the first assertion in this test
+
+    StartedAt : LWORD; // Temporary variable to calculate the actual duration of the test, the value holds the cpu cycle counter when a test is started in 100ns precision
+    Duration : LREAL; // Duration of the test in seconds
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="GetAssertionMessage" Id="{273c4e89-faee-43b5-803d-428cdf75ac48}">
+      <Declaration><![CDATA[METHOD INTERNAL GetAssertionMessage : T_MaxString]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GetAssertionMessage := AssertionMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetAssertionType" Id="{cd1419c3-7b07-4183-b487-40bdbb0bbce3}">
+      <Declaration><![CDATA[METHOD INTERNAL GetAssertionType : E_AssertionType]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GetAssertionType := AssertionType;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetDuration" Id="{3e6c864c-e46e-4560-84e2-e90d42108999}">
+      <Declaration><![CDATA[METHOD INTERNAL GetDuration : LREAL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GetDuration := Duration;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetName" Id="{94757f0e-9979-49d0-ad9f-e35c823175d4}">
+      <Declaration><![CDATA[METHOD INTERNAL GetName : T_MaxString;]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GetName := TestName;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetNumberOfAssertions" Id="{0cfa1f03-0295-4f8f-bfd9-24d7b7f17e37}">
+      <Declaration><![CDATA[METHOD INTERNAL GetNumberOfAssertions : UINT]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GetNumberOfAssertions := NumberOfAssertions;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetTestOrder" Id="{c2cf620d-27f0-4dc3-9f43-cee6a8334a60}">
+      <Declaration><![CDATA[// Gets in which order/sequence relative to the order tests should this test be executed/evaluated.
+METHOD INTERNAL GetTestOrder : UINT(0..GVL_Param_TcUnit.MaxNumberOfTestsForEachTestSuite);]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GetTestOrder := TestOrderNumber;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="IsFailed" Id="{e42409e3-251f-4133-8b14-3630785983d6}">
+      <Declaration><![CDATA[METHOD INTERNAL IsFailed : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IsFailed := TestIsFailed;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="IsFinished" Id="{813a9067-b864-4739-9c14-830160e0eabc}">
+      <Declaration><![CDATA[METHOD INTERNAL IsFinished : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IsFinished := TestIsFinished;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="IsSkipped" Id="{ff97feb1-1a4a-4f36-ba1d-f8483e588d4f}">
+      <Declaration><![CDATA[METHOD INTERNAL IsSkipped : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IsSkipped := TestIsSkipped;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetAssertionMessage" Id="{05091715-93d7-47f7-9b6c-cb2511f88eb7}">
+      <Declaration><![CDATA[// Sets the assertion message. If one already exists, it's not overwritten as we keep the first assertion in the test
+METHOD INTERNAL SetAssertionMessage
+VAR_INPUT
+    AssertMessage : T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF LEN(STR := AssertionMessage) = 0 THEN
+    AssertionMessage := AssertMessage;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetAssertionType" Id="{f885f3cc-c862-4d38-9dbb-f44d7639f6a8}">
+      <Declaration><![CDATA[// Sets the assertion type. If one already exists, it's not overwritten as we keep the first assertion in the test
+METHOD INTERNAL SetAssertionType
+VAR_INPUT
+    AssertType : E_AssertionType;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF AssertionType = E_AssertionType.Type_UNDEFINED THEN
+    AssertionType := AssertType;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetFailed" Id="{b840b41b-4045-4fd9-b97d-0bf226c46fb3}">
+      <Declaration><![CDATA[METHOD INTERNAL SetFailed]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestIsFailed := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetFinishedAndDuration" Id="{e1245d1c-be22-4d60-bc91-fe0262827234}">
+      <Declaration><![CDATA[METHOD INTERNAL SetFinishedAndDuration : BOOL
+VAR_INPUT
+    FinishedAt : LWORD; // CPU cycle counter with 100ns precision
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestIsFinished := TRUE;
+Duration := LWORD_TO_LREAL(FinishedAt - StartedAt) * GVL_TcUnit.HundredNanosecondToSecond; // Seconds]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetName" Id="{4c12f6eb-bbe4-4872-ac89-4411e2e81414}">
+      <Declaration><![CDATA[METHOD INTERNAL SetName
+VAR_INPUT
+    Name : T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestName := Name;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetNumberOfAssertions" Id="{94c630e9-29b9-45f4-8716-809aab6fb076}">
+      <Declaration><![CDATA[METHOD INTERNAL SetNumberOfAssertions
+VAR_INPUT
+    NoOfAssertions : UINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[NumberOfAssertions := NoOfAssertions;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetSkipped" Id="{e9a94cad-c60d-4460-92bf-2b70cf2f46b2}">
+      <Declaration><![CDATA[// Sets the test case to skipped
+METHOD INTERNAL SetSkipped]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestIsSkipped := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetStartedAtIfNotSet" Id="{35bcf245-cc42-44cc-8963-d5986e3acc7f}">
+      <Declaration><![CDATA[METHOD INTERNAL SetStartedAtIfNotSet
+VAR_INPUT
+    Timestamp : LWORD; // CPU cycle counter with 100ns precision
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF StartedAt = 0 THEN
+    StartedAt := Timestamp;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetTestOrder" Id="{9154b373-5715-4bb9-b58b-0dd484b21841}">
+      <Declaration><![CDATA[// Sets in which order/sequence relative to the order tests should this test be executed/evaluated.
+METHOD INTERNAL SetTestOrder
+VAR_INPUT
+    OrderNumber : UINT(0..GVL_Param_TcUnit.MaxNumberOfTestsForEachTestSuite);
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TestOrderNumber := OrderNumber;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
