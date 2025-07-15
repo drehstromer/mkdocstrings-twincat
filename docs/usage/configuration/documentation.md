@@ -3,6 +3,7 @@
 ## Guidelines in a Twincatproject
 
 Only tags between the fb name and the first var block are parsed
+A tag has to have the following format: (*tag Description of thing *)
 Multiline is possible
 Usage can be rendered to show as code
 
@@ -11,12 +12,12 @@ Only in, out, and in/out variable blocks are rendered. internal blocks are not r
 ```
     FUNCTION_BLOCK FB_AdjustAssertFailureMessageToMax253CharLength
     //
-    //@details This FunctionBlock does this and that.
-    //@usage use the functionblock like that. here is an example: FB_AdjustAssert.....
-    //@returns makes no sense at a fb. can be used at a method
+    (*details This FunctionBlock does this and that.*)
+    (*usage use the functionblock like that. here is an example: FB_AdjustAssert.....*)
+    (*returns makes no sense at a fb. can be used at a method*)
     //
-    //@tag1 there can be custom tags written. they will be rendered after the standard tags above
-    //@tag3 another tag
+    (*tag1 there can be custom tags written. they will be rendered after the standard tags above*)
+    (*tag3 another tag*)
     //
     //
     VAR_INPUT
