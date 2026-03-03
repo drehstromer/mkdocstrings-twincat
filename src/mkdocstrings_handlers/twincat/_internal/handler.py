@@ -5,6 +5,7 @@ from __future__ import annotations
 import glob
 import os
 import posixpath
+import re
 import sys
 from contextlib import suppress
 from pathlib import Path, PureWindowsPath
@@ -104,6 +105,10 @@ class TwincatHandler(BaseHandler):
         _logger.info(f"Search Paths: {self._paths}")
         self.load_all_objects(paths=self._paths)
         _logger.info(f"Parsed {len(self._collected)} twincat objects")
+
+        if config.filters:
+            self._apply_filters(config.filters)
+            _logger.info(f"After filtering: {len(self._collected)} twincat objects remain")
         
 
 
@@ -134,7 +139,44 @@ class TwincatHandler(BaseHandler):
                 if not tcobject.get_identifier() in self._collected:
                     self._collected[tcobject.get_identifier()] = tcobject
 
+    def _apply_filters(self, filters: list[str]) -> None:
+        """Apply regex filters to collected objects.
 
+        Filters are applied to object names. Patterns prefixed with `!` exclude
+        matching objects. Patterns without `!` include only matching objects.
+
+        Parameters:
+            filters: List of regex pattern strings.
+        """
+        include_patterns = []
+        exclude_patterns = []
+        for pattern in filters:
+            if pattern.startswith("!"):
+                exclude_patterns.append(re.compile(pattern[1:]))
+            else:
+                include_patterns.append(re.compile(pattern))
+
+        def matches_filters(name: str) -> bool:
+            if include_patterns and not any(p.search(name) for p in include_patterns):
+                return False
+            if any(p.search(name) for p in exclude_patterns):
+                return False
+            return True
+
+        # Filter pous in all parent objects that have a pous list
+        for obj in self._collected.values():
+            if hasattr(obj, "pous") and obj.pous:
+                obj.pous = [pou for pou in obj.pous if matches_filters(pou.name)]
+
+        # Remove filtered pous from the collected dict
+        to_remove = [
+            identifier
+            for identifier, obj in self._collected.items()
+            if obj.kind == "pou" and not matches_filters(obj.name)
+        ]
+        for identifier in to_remove:
+            del self._collected[identifier]
+            _logger.debug(f"Filtered out: {identifier}")
 
     def collect(self, identifier: str, options: TwincatOptions) -> CollectorItem:  # noqa: ARG002
         """Collect data given an identifier and selection configuration."""

@@ -413,6 +413,20 @@ class TwincatInputConfig:
         _Field(description="Strategy to parse the files"),
     ] = None
 
+    filters: Annotated[
+        list[str],
+        _Field(
+            description="""Regex filters for object names.
+
+            A list of regex patterns to filter objects by name.
+            Patterns prefixed with `!` are exclusion filters (matching objects are removed).
+            Patterns without `!` are inclusion filters (only matching objects are kept).
+            If both inclusion and exclusion filters are specified, an object must match
+            at least one inclusion pattern and no exclusion patterns.
+            """,
+        ),
+    ] = field(default_factory=list)
+
     # We want to validate options early, so we load them as `TwincatInputOptions`.
     options: Annotated[
         TwincatInputOptions,
